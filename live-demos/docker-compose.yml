@@ -1,0 +1,12 @@
+# One command to run all five demos locally:  docker compose up --build
+# Then open http://localhost:8501 and paste the OpenAI key in the sidebar.
+services:
+  live-demos:
+    build: .
+    ports:
+      - "8501:8501"
+    # The default key is read from .env (gitignored) and passed in at runtime —
+    # never baked into the image. Attendees can still override it in the sidebar.
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    restart: unless-stopped

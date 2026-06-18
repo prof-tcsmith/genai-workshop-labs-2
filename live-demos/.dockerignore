@@ -1,0 +1,9 @@
+# Never bake secrets into the image — they arrive at runtime via env (compose).
+.env
+.streamlit/secrets.toml
+__pycache__/
+*.pyc
+.venv/
+venv/
+.git
+.DS_Store

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enterprise AI for IS Faculty — hands-on labs</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.14);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;}
+  *{box-sizing:border-box} body{margin:0;background:
+      radial-gradient(1100px 600px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(800px 500px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;min-height:100vh}
+  .wrap{max-width:1060px;margin:0 auto;padding:34px 20px 64px}
+  .kicker{color:var(--accent2);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+  h1{font-size:clamp(26px,4vw,42px);margin:6px 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 0 22px;max-width:62ch}
+  .note{background:rgba(251,191,36,.10);border-left:4px solid var(--warn);border-radius:0 9px 9px 0;
+    padding:12px 16px;margin:0 0 24px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:740px){.grid{grid-template-columns:1fr}}
+  .lab{display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:13px;padding:16px 18px;transition:border-color .15s,transform .1s}
+  .lab:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .lab .layer{color:var(--accent2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .lab h3{margin:4px 0 4px;font-size:19px}
+  .lab p{margin:0;color:var(--muted);font-size:14px}
+  .lab .go{margin-top:10px;color:var(--accent);font-weight:600;font-size:14px}
+  code{background:#070c1a;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13px}
+  .foot{margin-top:26px;color:var(--faint);font-size:13px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="kicker">Enterprise AI for IS Faculty</span>
+  <h1>Hands-on labs</h1>
+  <p class="sub">The deck is the show; these are the do. Each lab runs in your browser in a few minutes — no install, no account.</p>
+
+  <div class="note">
+    <b>Before you start:</b> paste the <b>OpenAI key</b> Tim hands out when a lab asks for it (it stays in your browser only).
+    If a lab asks for a <b>workshop passphrase</b>, that's on the slide too.
+  </div>
+
+  <div class="grid">
+    <a class="lab" id="streamlit" href="REPLACE_WITH_STREAMLIT_URL">
+      <div class="layer">Layers 2–7 · Streamlit</div>
+      <h3>The four core labs</h3>
+      <p>Grounding (prompt → retrieval → tool), build &amp; break a RAG, an agent loop with an approval gate, and red-team-and-govern an agent.</p>
+      <div class="go">Open the lab app →</div>
+    </a>
+
+    <a class="lab" href="./prompt-lab/">
+      <div class="layer">Layer 3 · browser-only</div>
+      <h3>Prompt &amp; structured output</h3>
+      <p>Iterate prompts, change format and temperature, and extract clean JSON. Pure client-side — runs right here.</p>
+      <div class="go">Open the prompt lab →</div>
+    </a>
+
+    <a class="lab" href="./deck.html">
+      <div class="layer">Slides</div>
+      <h3>The deck</h3>
+      <p>The interactive slide deck — the 7-layer stack, the diagrams, and the three closing cases.</p>
+      <div class="go">Open the deck →</div>
+    </a>
+
+    <a class="lab" href="https://github.com/modelcontextprotocol/inspector" id="mcp">
+      <div class="layer">Layer 2 · advanced (Docker)</div>
+      <h3>MCP tool server</h3>
+      <p>Run a small MCP server in a container and connect a client. See <code>mcp-lab/README.md</code> in the repo for steps.</p>
+      <div class="go">Setup instructions →</div>
+    </a>
+  </div>
+
+  <p class="foot">
+    Facilitator: replace <code>REPLACE_WITH_STREAMLIT_URL</code> with the deployed Streamlit app URL before the session,
+    pre-warm the Streamlit app (free apps sleep when idle), and use a budget-capped key that you revoke afterward.
+  </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Never commit keys or local state
+.env
+**/.streamlit/secrets.toml
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+dist/
+.DS_Store

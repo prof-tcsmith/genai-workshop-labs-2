@@ -1,0 +1,10 @@
+[theme]
+base = "dark"
+primaryColor = "#6ea8fe"
+backgroundColor = "#0b1020"
+secondaryBackgroundColor = "#141d36"
+textColor = "#eaf0ff"
+
+[server]
+# Keep uploads small; these labs are lightweight.
+maxUploadSize = 5

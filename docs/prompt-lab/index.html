@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prompt & structured-output lab</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.14);--accent:#6ea8fe;--accent2:#5eead4;--danger:#fb7185;--ok:#34d399;}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 60px}
+  h1{font-size:clamp(22px,3.4vw,32px);margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px}
+  .kicker{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:12px;padding:16px;margin-bottom:14px}
+  label{display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:var(--muted)}
+  input,textarea,select{width:100%;background:#070c1a;color:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:9px 11px;font-family:inherit;font-size:14px}
+  textarea{resize:vertical}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:200px}
+  .btn{cursor:pointer;font-weight:650;border-radius:9px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);padding:9px 15px;font-size:14px}
+  .btn.primary{background:linear-gradient(95deg,var(--accent),#4f86f0);border-color:transparent;color:#06122e}
+  .btn.small{padding:5px 10px;font-size:12px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .out{white-space:pre-wrap;background:#070c1a;border:1px solid var(--line);border-radius:10px;
+    padding:13px;min-height:80px;font-size:14px}
+  .mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  .muted{color:var(--muted)} .small{font-size:12px} .err{color:var(--danger)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:7px 13px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Layer 3 · browser lab — no install</div>
+  <h1>Prompt &amp; structured-output lab</h1>
+  <p class="sub">Iterate a prompt, change the format and temperature, and extract clean JSON. Calls run from your browser; your key never leaves this page.</p>
+
+  <div class="card">
+    <label>OpenAI API key (paste the one Tim hands out)</label>
+    <input id="key" type="password" placeholder="sk-..." autocomplete="off" />
+    <div class="pills">
+      <label class="small" style="display:flex;align-items:center;gap:6px;font-weight:500;color:var(--muted)">
+        <input id="remember" type="checkbox" style="width:auto" /> remember for this browser tab
+      </label>
+      <span class="small muted">· model:</span>
+      <select id="model" style="width:auto">
+        <option value="gpt-4o-mini" selected>gpt-4o-mini (cheap)</option>
+        <option value="gpt-4o">gpt-4o</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>System prompt</label>
+        <textarea id="sys" rows="2">You are a helpful assistant.</textarea>
+      </div>
+      <div style="max-width:240px;flex:0 0 240px">
+        <label>Temperature: <span id="tval">0.7</span></label>
+        <input id="temp" type="range" min="0" max="1.5" step="0.1" value="0.7" />
+        <label style="margin-top:10px">Output format</label>
+        <div class="seg" id="fmt">
+          <button data-v="text" class="on">Freeform</button>
+          <button data-v="json">Structured (JSON)</button>
+        </div>
+      </div>
+    </div>
+    <label style="margin-top:12px">User prompt</label>
+    <textarea id="user" rows="5">Write two sentences explaining what retrieval-augmented generation is to a business executive.</textarea>
+    <div class="pills">
+      <span class="small muted">Try:</span>
+      <button class="btn small" data-preset="extract">Extract structured data</button>
+      <button class="btn small" data-preset="classify">Classify sentiment</button>
+      <button class="btn small" data-preset="rewrite">Rewrite formally</button>
+    </div>
+    <div style="margin-top:12px"><button id="run" class="btn primary">Run ▸</button></div>
+  </div>
+
+  <div class="card">
+    <label>Response</label>
+    <div id="out" class="out muted">Output appears here.</div>
+  </div>
+
+  <p class="small muted">Tip: switch to <b>Structured (JSON)</b> and run the “Extract structured data” preset — see how asking for a schema turns prose into machine-usable output. · <a href="../">← back to labs</a></p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let fmt = "text";
+
+// restore key for this tab
+try { const k = sessionStorage.getItem("oai_key"); if (k){ $("key").value = k; $("remember").checked = true; } } catch(e){}
+$("remember").addEventListener("change", () => { try { $("remember").checked ? sessionStorage.setItem("oai_key",$("key").value) : sessionStorage.removeItem("oai_key"); } catch(e){} });
+$("key").addEventListener("input", () => { if ($("remember").checked){ try{ sessionStorage.setItem("oai_key",$("key").value);}catch(e){} } });
+
+$("temp").addEventListener("input", e => $("tval").textContent = e.target.value);
+document.querySelectorAll("#fmt button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#fmt button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); fmt = b.dataset.v;
+}));
+
+const PRESETS = {
+  extract: { sys:"You extract structured data.", fmt:"json",
+    user:'Extract product, sentiment (positive/negative/neutral), rating (1-5), and a list of issues from this review:\n\n"The dashboard is fast and the support team was great, but the export feature kept crashing and the price feels high."' },
+  classify: { sys:"You are a precise text classifier.", fmt:"json",
+    user:'Classify the sentiment of each line as positive/negative/neutral. Return JSON {results:[{text,sentiment}]}.\n\n- Loved the onboarding\n- The app crashed twice today\n- It is fine, nothing special' },
+  rewrite: { sys:"You rewrite text in a formal, executive tone.", fmt:"text",
+    user:"Rewrite this for a board memo: 'we kinda think AI could maybe help us move faster and save some cash.'" },
+};
+document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => {
+  const p = PRESETS[b.dataset.preset]; $("sys").value = p.sys; $("user").value = p.user;
+  document.querySelectorAll("#fmt button").forEach(x=>x.classList.toggle("on", x.dataset.v===p.fmt)); fmt = p.fmt;
+}));
+
+$("run").addEventListener("click", async () => {
+  const key = $("key").value.trim();
+  const out = $("out");
+  if (!key){ out.className="out err"; out.textContent="Paste your OpenAI key first."; return; }
+  out.className="out muted"; out.textContent="Running…";
+  let sys = $("sys").value;
+  const body = {
+    model: $("model").value,
+    temperature: parseFloat($("temp").value),
+    max_tokens: 700,
+    messages: [{role:"system",content: sys + (fmt==="json" ? " Respond ONLY with valid JSON." : "")},
+               {role:"user",content: $("user").value}],
+  };
+  if (fmt==="json") body.response_format = {type:"json_object"};
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok){ out.className="out err"; out.textContent="Error: " + (data.error?.message || res.status); return; }
+    let text = data.choices[0].message.content;
+    out.className = "out" + (fmt==="json" ? " mono" : "");
+    if (fmt==="json"){ try { text = JSON.stringify(JSON.parse(text), null, 2); } catch(e){} }
+    out.textContent = text;
+  } catch(e){ out.className="out err"; out.textContent="Network error: " + e.message + "  (check the key / connection)"; }
+});
+</script>
+</body>
+</html>

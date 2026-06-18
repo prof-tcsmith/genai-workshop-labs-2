@@ -1,0 +1,120 @@
+"""Shared infrastructure for the 5 progressive live demos.
+
+- One OpenAI key, pasted in the sidebar, held in session memory only.
+- Cheap model defaults + a per-session request cap (shared key safety).
+- A "layers in play" badge that ties each demo to the 7-layer stack.
+"""
+from __future__ import annotations
+
+import os
+
+import streamlit as st
+
+CHAT_MODEL = "gpt-4o-mini"
+EMBED_MODEL = "text-embedding-3-small"
+MAX_TOKENS = 700
+REQ_CAP = 120  # soft per-session cap to protect the shared key
+
+STACK = {
+    1: "Experience", 2: "Orchestration", 3: "Model", 4: "Retrieval & context",
+    5: "Enterprise systems", 6: "Data foundation", 7: "Governance",
+}
+
+
+def _secret(name: str):
+    try:
+        return st.secrets.get(name)  # type: ignore[attr-defined]
+    except Exception:
+        return None
+
+
+def default_key() -> str | None:
+    """A workshop default key, from Streamlit secrets or the OPENAI_API_KEY env var.
+    Never hard-coded in source — set it in a gitignored secrets.toml or .env."""
+    return _secret("openai_api_key") or os.environ.get("OPENAI_API_KEY")
+
+
+def render_key_sidebar() -> str | None:
+    st.sidebar.header("🔑 OpenAI key")
+    dflt = default_key()
+    entered = st.sidebar.text_input(
+        "Your OpenAI key (optional)", type="password", key="user_key_input",
+        placeholder="workshop default active — paste to override" if dflt else "sk-...",
+        help="A workshop default may be configured. Paste your own to use it instead. "
+             "Held in this browser session only — never stored or logged.",
+    )
+    eff = entered.strip() if entered and entered.strip() else dflt
+    st.session_state["key"] = eff
+    if entered and entered.strip():
+        st.sidebar.caption("Using **your** key.")
+    elif dflt:
+        st.sidebar.caption("Using the **workshop default** key.")
+    else:
+        st.sidebar.caption("No key yet — paste one above.")
+    st.sidebar.caption(f"Model `{CHAT_MODEL}` · shared key — please be gentle.")
+    return eff
+
+
+def openai_guard(e: Exception) -> None:
+    """Turn an OpenAI exception into a friendly message and stop — never a raw traceback."""
+    msg = str(e)
+    low = msg.lower()
+    if any(s in low for s in ("invalid_api_key", "incorrect api key", "authentication", "no api key")) or "401" in msg:
+        st.error("🔑 The OpenAI key was rejected (invalid or expired). Paste a valid key in the sidebar.")
+    elif any(s in low for s in ("rate limit", "quota", "insufficient_quota")) or "429" in msg:
+        st.error("⏳ The key hit a rate or quota limit. Wait a moment, or paste a different key.")
+    else:
+        st.error(f"OpenAI request failed: {e}")
+    st.stop()
+
+
+def get_client():
+    k = st.session_state.get("key")
+    if not k:
+        return None
+    try:
+        from openai import OpenAI
+    except Exception:
+        st.error("The `openai` package is not installed.")
+        st.stop()
+    return OpenAI(api_key=k)
+
+
+def boot(title: str):
+    """Top of every demo page: config, key entry, return a ready client (or stop)."""
+    st.set_page_config(page_title=title, page_icon="🎬", layout="wide")
+    render_key_sidebar()
+    client = get_client()
+    if client is None:
+        st.title(title)
+        st.info("⬅️ Paste the OpenAI key in the sidebar to run this demo.")
+        st.stop()
+    return client
+
+
+def layer_badge(layers: list[int]) -> None:
+    chips = " · ".join(f"**{i}** {STACK[i]}" for i in layers)
+    st.caption("🧱 Layers in play: " + chips)
+
+
+def _bump() -> None:
+    n = st.session_state.get("_reqs", 0) + 1
+    st.session_state["_reqs"] = n
+    if n > REQ_CAP:
+        st.error("Per-session request limit reached (protects the shared key). Refresh to reset.")
+        st.stop()
+
+
+def chat(client, messages, tools=None, tool_choice=None, model: str | None = None,
+         max_tokens: int = MAX_TOKENS, temperature: float = 0.3):
+    """chat.completions wrapper with caps + a session request counter."""
+    _bump()
+    kw = dict(model=model or CHAT_MODEL, messages=messages, max_tokens=max_tokens, temperature=temperature)
+    if tools:
+        kw["tools"] = tools
+    if tool_choice:
+        kw["tool_choice"] = tool_choice
+    try:
+        return client.chat.completions.create(**kw)
+    except Exception as e:
+        openai_guard(e)
