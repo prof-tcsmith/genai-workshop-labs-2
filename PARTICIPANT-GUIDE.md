@@ -41,14 +41,19 @@ You need four things. Install them **before** the session and verify them (comma
 3. **git** — https://git-scm.com/downloads (macOS: `git` ships with the Xcode command-line tools).
 
 ### Verify everything (paste into your terminal)
+Run these **one line at a time** (each should print a version; `docker info` should print engine details):
 ```bash
-bash --version      # any 3.2+ is fine
+bash --version
 git --version
 docker --version
 docker compose version
-docker info         # should print engine info — if it errors, start Docker Desktop / OrbStack
+docker info
 ```
-If `docker info` errors, your Docker engine isn't running yet — open Docker Desktop (or OrbStack) and wait a few seconds.
+Notes:
+- `bash` 3.2+ is fine. If `docker info` shows *"Cannot connect to the Docker daemon,"* your Docker
+  engine isn't running — open **Docker Desktop** (or **OrbStack**), wait a few seconds, and retry.
+- Don't paste a `#` comment after a command — some shells pass the comment to the program as
+  arguments (e.g. `docker info  # note` can error with *"accepts no arguments"*). Just run the bare command.
 
 ---
 
@@ -65,9 +70,9 @@ cd genai-workshop-labs
 - **Or set it once:** copy the example env file and paste the key into it:
   ```bash
   cp .env.example .env
-  # open .env in any editor and replace sk-proj-your-key-here with the workshop key
   ```
-  (`.env` is git-ignored — your key won't be committed.)
+  Then open `.env` in any editor and replace `sk-proj-your-key-here` with the workshop key.
+  (`.env` is git-ignored, so your key won't be committed.)
 
 ### 3. Start the demos
 ```bash

@@ -24,10 +24,12 @@ Full step-by-step with prerequisites: see **`PARTICIPANT-GUIDE.md`**.
 ```bash
 git clone https://github.com/prof-tcsmith/genai-workshop-labs.git
 cd genai-workshop-labs
-cp .env.example .env        # paste your OpenAI key into .env (or paste it in the app sidebar later)
-docker compose up           # pulls the prebuilt images from Docker Hub
+cp .env.example .env
+docker compose up
 ```
 
+Paste the OpenAI key into `.env` after copying it (or paste it in the app sidebar later);
+`docker compose up` pulls the prebuilt images from Docker Hub.
 Then open **http://localhost:8501** (live demos) and **http://localhost:8000** (MCP lab).
 Walk Levels 1 → 5; each adds one capability and lights up more of the stack.
 Stop with **Ctrl-C**; `docker compose down` to remove the containers.
