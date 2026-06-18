@@ -10,4 +10,4 @@ ENV MCP_TRANSPORT=streamable-http
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["python", "server.py"]
+CMD ["sh", "-c", "echo '  GenAI Workshop — MCP lab  |  (c) Dr. Tim Smith, 2026'; python server.py"]

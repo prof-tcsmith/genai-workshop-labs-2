@@ -1,0 +1,19 @@
+# GenAI Workshop — (c) Dr. Tim Smith, 2026
+# Participants: `docker compose up` pulls the prebuilt images from Docker Hub.
+# Each container prints the copyright banner to the console on startup.
+name: genai-workshop
+services:
+  live-demos:
+    image: proftsmith/genai-live-demos:latest
+    ports:
+      - "8501:8501"
+    # The OpenAI key is supplied at runtime (root .env or pasted in the UI) — never baked in.
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    restart: unless-stopped
+
+  mcp-lab:
+    image: proftsmith/genai-mcp-lab:latest
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

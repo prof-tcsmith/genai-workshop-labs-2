@@ -16,16 +16,21 @@ Everything is organized around one map: the **7-layer enterprise AI stack**.
 | **`mcp-lab/`** | An MCP tool server (advanced) | see `mcp-lab/README.md` |
 | **`docs/`** | The slide deck + a browser prompt lab (served via GitHub Pages) | open `docs/index.html` |
 
-## Quick start — the live demos (recommended)
+## Quick start (participants)
+
+You need a terminal, **Docker** (Docker Desktop or OrbStack, running), and **git**.
+Full step-by-step with prerequisites: see **`PARTICIPANT-GUIDE.md`**.
 
 ```bash
-cd live-demos
-cp .env.example .env        # then paste your OpenAI key into .env
-docker compose up --build   # first build ~1–2 min
-# open http://localhost:8501  (or paste the key in the sidebar instead of using .env)
+git clone https://github.com/prof-tcsmith/genai-workshop-labs.git
+cd genai-workshop-labs
+cp .env.example .env        # paste your OpenAI key into .env (or paste it in the app sidebar later)
+docker compose up           # pulls the prebuilt images from Docker Hub
 ```
 
+Then open **http://localhost:8501** (live demos) and **http://localhost:8000** (MCP lab).
 Walk Levels 1 → 5; each adds one capability and lights up more of the stack.
+Stop with **Ctrl-C**; `docker compose down` to remove the containers.
 
 ## Your OpenAI key
 
