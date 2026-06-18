@@ -37,16 +37,20 @@ def default_key() -> str | None:
 def render_key_sidebar() -> str | None:
     st.sidebar.header("🔑 OpenAI key")
     dflt = default_key()
+    # Drive the field from a plain session var via value= so it REPOPULATES on
+    # every page (widget state alone doesn't reliably carry across multipage nav).
     entered = st.sidebar.text_input(
-        "Your OpenAI key (optional)", type="password", key="user_key_input",
+        "Your OpenAI key (optional)", type="password",
+        value=st.session_state.get("user_key", ""),
         placeholder="workshop default active — paste to override" if dflt else "sk-...",
         help="A workshop default may be configured. Paste your own to use it instead. "
              "Held in this browser session only — never stored or logged.",
-    )
-    eff = entered.strip() if entered and entered.strip() else dflt
+    ).strip()
+    st.session_state["user_key"] = entered  # remember across page switches
+    eff = entered if entered else dflt
     st.session_state["key"] = eff
-    if entered and entered.strip():
-        st.sidebar.caption("Using **your** key.")
+    if entered:
+        st.sidebar.caption("✅ Using **your** key (entered).")
     elif dflt:
         st.sidebar.caption("Using the **workshop default** key.")
     else:
