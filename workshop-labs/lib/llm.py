@@ -7,6 +7,7 @@ Design goals:
 """
 from __future__ import annotations
 
+import hashlib
 import os
 
 import streamlit as st
@@ -26,17 +27,27 @@ def _secret(name: str):
 
 # ---------------------------------------------------------------- access gate
 def ensure_access() -> None:
-    """If a workshop passphrase is configured, require it before anything else."""
-    expected = _secret("workshop_passphrase")
-    if not expected:
-        return  # gate disabled (local/dev)
+    """Require the workshop passphrase before anything else.
+
+    The passphrase is NEVER stored in plaintext. Configure the SHA-256 hash in
+    `workshop_passphrase_sha256` (preferred). A plaintext `workshop_passphrase`
+    secret is still honored as a fallback for local dev, but don't commit it.
+    """
+    expected_hash = _secret("workshop_passphrase_sha256")
+    expected_plain = _secret("workshop_passphrase")  # local-dev fallback only
+    if not expected_hash and not expected_plain:
+        return  # gate disabled (no secret set)
     if st.session_state.get("_pass_ok"):
         return
     st.title("🔒 Workshop labs")
     st.write("Enter the workshop passphrase to continue.")
     pw = st.text_input("Passphrase", type="password")
     if st.button("Enter"):
-        if pw == expected:
+        if expected_hash:
+            ok = hashlib.sha256(pw.encode("utf-8")).hexdigest() == str(expected_hash).strip().lower()
+        else:
+            ok = pw == expected_plain
+        if ok:
             st.session_state["_pass_ok"] = True
             st.rerun()
         else:

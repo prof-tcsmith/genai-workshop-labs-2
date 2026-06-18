@@ -22,10 +22,14 @@ No `.env`? Attendees can paste the key in the sidebar instead.
 ## workshop-labs → Streamlit Community Cloud (free)
 1. https://share.streamlit.io → New app → repo `prof-tcsmith/genai-workshop-labs`.
 2. **Main file path:** `workshop-labs/streamlit_app.py` · Branch `main`.
-3. **Settings → Secrets:**
+3. **Settings → Secrets** (these live only in Cloud, never in git):
    ```toml
-   openai_api_key = "sk-..."          # the workshop key (only lives here, not in git)
-   workshop_passphrase = "muma-genai-2026"   # gates the public URL to attendees
+   openai_api_key = "sk-..."                  # the workshop key
+   workshop_passphrase_sha256 = "<64-char hash>"   # SHA-256 of the passphrase, NOT the phrase
+   ```
+   Generate the hash (hand the *plain* passphrase to attendees, store only its hash):
+   ```bash
+   printf '%s' 'your-passphrase' | shasum -a 256
    ```
 4. Deploy; **pre-warm** it right before the session (free apps sleep when idle).
 

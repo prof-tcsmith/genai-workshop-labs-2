@@ -4,11 +4,13 @@ import streamlit as st
 
 from lib.llm import boot, chat
 from lib import rag
+from lib.slides import render_slides
 
 client = boot("Grounding: prompt → retrieval → tool")
 
 st.title("Grounding: prompt → retrieval → tool-use")
 st.caption("Layers 3–4 · Same question, three levels of grounding. Watch the answer become verifiable.")
+render_slides("grounding")
 
 # A mock enterprise system (Layer 5) the tool reads from.
 ORDERS = {

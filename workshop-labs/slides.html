@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept slides</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.16);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;--ok:#34d399;--danger:#fb7185;}
+  *{box-sizing:border-box} html,body,#root{height:100%;margin:0}
+  body{background:
+      radial-gradient(900px 500px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(700px 460px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .deck{height:100%;display:flex;flex-direction:column;padding:16px 20px 10px}
+  .kick{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+  .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px}
+  h2{font-size:clamp(20px,3.4vw,30px);margin:0;line-height:1.1;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(13px,1.8vw,17px);margin:0}
+  ul{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+  li{position:relative;padding-left:22px;font-size:clamp(13px,1.7vw,16px);line-height:1.4}
+  li::before{content:"";position:absolute;left:2px;top:.55em;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 9px rgba(110,168,254,.7)}
+  b{color:#fff}
+  .note{border-left:3px solid var(--accent2);background:rgba(94,234,212,.10);border-radius:0 8px 8px 0;
+    padding:9px 12px;font-size:clamp(12px,1.6vw,15px)}
+  .anim{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{display:flex;align-items:center;gap:12px;padding-top:8px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .2s}
+  .dot.on{background:var(--accent2)}
+  .nav{display:flex;gap:6px}
+  button.nav-b{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:8px;width:30px;height:30px;font-size:15px}
+  button.nav-b:hover{border-color:var(--accent)}
+  button.nav-b:disabled{opacity:.35;cursor:default}
+  .num{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  /* viz */
+  .viz{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:12px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .meterlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line)}
+  .loop{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .node{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;transition:all .3s}
+  .node.on{border-color:var(--accent2);background:rgba(94,234,212,.14);color:var(--accent2);box-shadow:0 0 16px rgba(94,234,212,.35)}
+  .arrow{color:var(--faint)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  small.muted{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(React.createElement);
+
+/* ---------- interactive viz components (one per topic) ---------- */
+function GroundingMeter() {
+  const data = {
+    Prompt:       { Grounding: 18, Verifiability: 10, Freshness: 22 },
+    "+ Retrieval":{ Grounding: 72, Verifiability: 74, Freshness: 50 },
+    "+ Tool use": { Grounding: 94, Verifiability: 96, Freshness: 96 },
+  };
+  const [m, setM] = useState("Prompt");
+  const color = v => v >= 75 ? "var(--ok)" : v >= 45 ? "var(--warn)" : "var(--danger)";
+  return html`<div class="viz">
+    <div class="seg">${Object.keys(data).map(k => html`<button key=${k} class=${m===k?'on':''} onClick=${()=>setM(k)}>${k}</button>`)}</div>
+    ${Object.entries(data[m]).map(([k,v]) => html`<div key=${k}>
+        <div class="meterlbl"><span>${k}</span><span>${v}%</span></div>
+        <div class="bar"><i style=${{width:v+'%',background:color(v)}}></i></div>
+      </div>`)}
+    <small class="muted">Same question, three levels of grounding — watch the meters move.</small>
+  </div>`;
+}
+function ChunkSlider() {
+  const [s, setS] = useState(600);
+  const quality = Math.max(8, Math.round(100 - Math.abs(s-600)/12));
+  const color = quality >= 70 ? "var(--ok)" : quality >= 40 ? "var(--warn)" : "var(--danger)";
+  const verdict = s < 250 ? "Tiny chunks fragment the rule — retrieval misses it."
+    : s > 950 ? "Huge chunks dilute relevance — noise crowds the answer."
+    : "Balanced chunks — the whole rule fits in one snippet.";
+  return html`<div class="viz">
+    <div class="row"><span class="num">chunk size</span>
+      <input type="range" min="80" max="1200" step="20" value=${s} onInput=${e=>setS(+e.target.value)} style=${{flex:1}}/>
+      <span class="num">${s} chars</span></div>
+    <div class="meterlbl"><span>retrieval quality</span><span>${quality}%</span></div>
+    <div class="bar"><i style=${{width:quality+'%',background:color}}></i></div>
+    <small class="muted">${verdict}</small>
+  </div>`;
+}
+function AgentLoop() {
+  const steps = ["Plan","Act (tool)","Observe"];
+  const [i, setI] = useState(0);
+  const [auto, setAuto] = useState(true);
+  useEffect(() => { if(!auto) return; const t=setInterval(()=>setI(x=>(x+1)%3),1100); return ()=>clearInterval(t); }, [auto]);
+  return html`<div class="viz">
+    <div class="loop">
+      ${steps.map((s,k)=>html`<span key=${k}>
+        <span class=${'node'+(k===i?' on':'')}>${s}</span>${k<2?html`<span class="arrow"> → </span>`:''}
+      </span>`)}
+      <span class="arrow"> ↻ </span>
+    </div>
+    <div class="row" style=${{marginTop:10}}>
+      <button class="nav-b" style=${{width:'auto',padding:'0 12px'}} onClick=${()=>{setAuto(false);setI(x=>(x+1)%3);}}>Step ▸</button>
+      <button class="nav-b" style=${{width:'auto',padding:'0 12px'}} onClick=${()=>setAuto(a=>!a)}>${auto?'Pause':'Auto'}</button>
+      <small class="muted">…repeat until the goal is met.</small>
+    </div>
+  </div>`;
+}
+function AttackMatrix() {
+  const M = {
+    "Prompt injection": { "Input filtering":["Blocked","var(--ok)"], "RBAC":["Reduced","var(--warn)"], "Audit only":["Exposed","var(--danger)"] },
+    "Data exfiltration":{ "Input filtering":["Reduced","var(--warn)"], "RBAC":["Blocked","var(--ok)"], "Audit only":["Reduced","var(--warn)"] },
+    "Excessive agency": { "Input filtering":["Exposed","var(--danger)"], "RBAC":["Blocked","var(--ok)"], "Audit only":["Reduced","var(--warn)"] },
+  };
+  const [a,setA]=useState("Prompt injection");
+  const [c,setC]=useState("Input filtering");
+  const [verdict,color]=M[a][c];
+  return html`<div class="viz">
+    <small class="muted">Attack</small>
+    <div class="seg">${Object.keys(M).map(k=>html`<button key=${k} class=${a===k?'on':''} onClick=${()=>setA(k)}>${k}</button>`)}</div>
+    <small class="muted" style=${{display:'block',marginTop:8}}>Control</small>
+    <div class="seg">${Object.keys(M[a]).map(k=>html`<button key=${k} class=${c===k?'on':''} onClick=${()=>setC(k)}>${k}</button>`)}</div>
+    <div style=${{marginTop:10}}><span class="pill" style=${{color,borderColor:color}}>${verdict}</span>
+      <small class="muted"> · no single control is enough — defense in depth.</small></div>
+  </div>`;
+}
+const VIZ = { groundingMeter: GroundingMeter, chunkSlider: ChunkSlider, agentLoop: AgentLoop, attackMatrix: AttackMatrix };
+
+/* ---------- content: one entry per lab ---------- */
+const TOPICS = {
+  grounding: { kicker:"Lab 1 · Layers 3–4", slides:[
+    { h:"Grounding: prompt → retrieval → tool", sub:"How an answer goes from a guess to something checkable." },
+    { h:"A bare prompt is unverifiable", bullets:["The model answers from training data — fluent, confident.","No link to your policy or this customer's data.","Plausible is not the same as correct."] },
+    { h:"Add retrieval → grounded", bullets:["Pull the relevant snippet from your documents.","The answer can now quote and cite a source.","Still blind to live, transactional data."] },
+    { h:"Add a tool → current & auditable", bullets:["Call a system (e.g. look up the order) for live facts.","Every call is logged — you can audit how it answered.","Grounding + freshness + verifiability together."], viz:"groundingMeter" },
+    { h:"Takeaway", sub:"Reliability comes from the architecture around the model — not a bigger model.", note:"In the lab: run the same question in all three modes and watch what changes." },
+  ]},
+  rag: { kicker:"Lab 2 · Layers 4 & 6", slides:[
+    { h:"Retrieval is a data problem", sub:"Most 'RAG failures' are data-engineering failures the pipeline exposes." },
+    { h:"The pipeline", bullets:["Chunk your documents into passages.","Embed them and store the vectors.","Search by similarity, feed the top hits to the model."] },
+    { h:"Break it: chunking", bullets:["Too small → the rule is split across chunks and missed.","Too big → the answer is buried in noise.","Chunking is a design decision, not a default."], viz:"chunkSlider" },
+    { h:"Break it: stale & leaky", bullets:["A stale, conflicting doc makes the answer flip.","A retrieved restricted doc is a real permission leak.","Freshness and access control must reach retrieval."] },
+    { h:"Takeaway", sub:"Retrieval quality dominates output quality.", note:"In the lab: tune the chunking, then sabotage the corpus and watch quality collapse." },
+  ]},
+  agent: { kicker:"Lab 3 · Layer 2", slides:[
+    { h:"The agent loop", sub:"What turns a model into something that can act." },
+    { h:"Plan → act → observe → repeat", bullets:["The model decides which tool to call.","It runs the tool and reads the result.","It loops until the goal is met."], viz:"agentLoop" },
+    { h:"Tools = the ability to act", bullets:["Look up an order, search policy, do math, issue a refund.","Reads are safe; writes are consequential.","Capability and risk grow together."] },
+    { h:"The approval gate", bullets:["Risky or irreversible actions pause for a human.","Cap the number of steps so it can't loop forever.","Log the whole trace for accountability."] },
+    { h:"Takeaway", sub:"The loop is simple; the discipline is gates, caps, and logs.", note:"In the lab: give a goal, watch the loop, and toggle the approval gate on a write." },
+  ]},
+  redteam: { kicker:"Lab 4 · Layer 7", slides:[
+    { h:"Build → attack → govern", sub:"Make an agent, try to break it, then defend it." },
+    { h:"How agents fail", bullets:["Prompt injection — untrusted content hijacks the instructions.","Excessive agency — more power than the task needs.","Data leakage — secrets surfaced to the wrong party."] },
+    { h:"Attack vs. control", bullets:["Each attack has a control that best stops it.","Filtering stops injection; RBAC stops over-reach.","Audit detects but rarely prevents."], viz:"attackMatrix" },
+    { h:"Governance = IS governance, specialized", bullets:["Tool permissioning is the new RBAC.","Approval gates are the new change control.","Reasoning traces are the new audit log."] },
+    { h:"Takeaway", sub:"No single control is enough — defense in depth.", note:"In the lab: attack an HR-policy agent, then switch controls on and watch them hold." },
+  ]},
+};
+
+function Deck() {
+  const forced = "__TOPIC_PLACEHOLDER__";
+  const fromQuery = new URLSearchParams(location.search).get('topic');
+  const topic = (forced && forced.indexOf('PLACEHOLDER') < 0) ? forced : (fromQuery || 'grounding');
+  const T = TOPICS[topic] || TOPICS.grounding;
+  const [i, setI] = useState(0);
+  const n = T.slides.length;
+  const go = d => setI(x => Math.max(0, Math.min(n-1, x+d)));
+  useEffect(() => {
+    const k = e => { if(e.key==='ArrowRight'||e.key===' ') go(1); if(e.key==='ArrowLeft') go(-1); };
+    window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
+  });
+  const s = T.slides[i];
+  const Viz = s.viz ? VIZ[s.viz] : null;
+  return html`<div class="deck">
+    <div class="kick">${T.kicker}</div>
+    <div class="stage anim" key=${i}>
+      <h2>${s.h}</h2>
+      ${s.sub ? html`<p class="sub">${s.sub}</p>` : ''}
+      ${s.bullets ? html`<ul>${s.bullets.map((b,k)=>html`<li key=${k} dangerouslySetInnerHTML=${{__html:b}}></li>`)}</ul>` : ''}
+      ${Viz ? html`<${Viz}/>` : ''}
+      ${s.note ? html`<div class="note">${s.note}</div>` : ''}
+    </div>
+    <div class="foot">
+      <div class="dots">${T.slides.map((_,k)=>html`<span key=${k} class=${'dot'+(k===i?' on':'')} onClick=${()=>setI(k)}></span>`)}</div>
+      <span class="num">${i+1} / ${n}</span>
+      <div class="nav">
+        <button class="nav-b" onClick=${()=>go(-1)} disabled=${i===0}>‹</button>
+        <button class="nav-b" onClick=${()=>go(1)} disabled=${i===n-1}>›</button>
+      </div>
+    </div>
+  </div>`;
+}
+createRoot(document.getElementById('root')).render(html`<${Deck}/>`);
+</script>
+</body>
+</html>

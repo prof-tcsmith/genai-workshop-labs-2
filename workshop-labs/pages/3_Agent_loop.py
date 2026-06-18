@@ -6,11 +6,13 @@ import streamlit as st
 
 from lib.llm import boot, chat
 from lib import rag
+from lib.slides import render_slides
 
 client = boot("Agent loop with tools")
 
 st.title("Agent loop with tools")
 st.caption("Layer 2 · Give a goal; the agent plans → calls a tool → observes → loops. Toggle the approval gate on writes.")
+render_slides("agent")
 
 # ---- mock enterprise systems (Layer 5) ----
 ORDERS = {

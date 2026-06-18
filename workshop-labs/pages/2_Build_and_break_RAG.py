@@ -2,11 +2,13 @@ import streamlit as st
 
 from lib.llm import boot, chat
 from lib import rag
+from lib.slides import render_slides
 
 client = boot("Build & break a RAG")
 
 st.title("Build & break a RAG")
 st.caption("Layers 4 & 6 · Build a tiny retrieval pipeline, then sabotage it and watch quality collapse.")
+render_slides("rag")
 
 corpus_all = rag.load_corpus()
 default_docs = [n for n in corpus_all if "RESTRICTED" not in n]

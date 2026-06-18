@@ -5,11 +5,13 @@ import streamlit as st
 
 from lib.llm import boot, chat
 from lib import rag
+from lib.slides import render_slides
 
 client = boot("Red-team & govern an agent")
 
 st.title("Red-team & govern an agent")
 st.caption("Layer 7 · Attack an HR-policy agent, then switch on controls and watch the attacks fail.")
+render_slides("redteam")
 
 EMPLOYEES = {"Dana": {"balance_days": 7}, "Sam": {"balance_days": 3}}
 SECRET_RE = re.compile(r"HR-OVERRIDE-\w+", re.I)
