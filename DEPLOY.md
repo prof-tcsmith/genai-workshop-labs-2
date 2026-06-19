@@ -33,6 +33,19 @@ No `.env`? Attendees can paste the key in the sidebar instead.
    ```
 4. Deploy; **pre-warm** it right before the session (free apps sleep when idle).
 
+## live-demos → Streamlit Community Cloud (free, second app)
+Host the 5 progressive demos on Cloud too (in addition to / instead of local Docker):
+1. https://share.streamlit.io → New app → repo `prof-tcsmith/genai-workshop-labs`.
+2. **Main file path:** `live-demos/app.py` · Branch `main`.
+3. **Settings → Secrets:**
+   ```toml
+   openai_api_key = "sk-..."                       # the workshop key (lives only in Cloud)
+   workshop_passphrase_sha256 = "<64-char hash>"   # participant code, hashed (see above)
+   ```
+   The participant-code gate turns on **only** when `workshop_passphrase_sha256` is set,
+   so local Docker stays gate-free. The OpenAI key is read from Secrets (never committed).
+4. Deploy; **pre-warm** before the session.
+
 ## docs → GitHub Pages (free)
 1. Repo **Settings → Pages → Deploy from a branch** → branch `main`, folder **`/docs`**.
 2. Site: **https://prof-tcsmith.github.io/genai-workshop-labs/**

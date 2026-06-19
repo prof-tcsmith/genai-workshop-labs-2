@@ -14,12 +14,13 @@ _DECKS = Path(__file__).resolve().parents[1] / "decks"
 PAGES_BASE = "https://prof-tcsmith.github.io/genai-workshop-labs/decks/live"
 
 
-def render_slides(topic: str, label: str = "📊 Concept slides (interactive)") -> None:
+def render_slides(topic: str, label: str = "📊 Concept slides (interactive)",
+                  expanded: bool = False, height: int = 540) -> None:
     deck = _DECKS / f"{topic}.html"
     try:
         html = deck.read_text(encoding="utf-8")
     except Exception:
         return
-    with st.expander(label, expanded=False):
-        components.html(html, height=540, scrolling=False)
+    with st.expander(label, expanded=expanded):
+        components.html(html, height=height, scrolling=False)
         st.markdown(f"[↗ Open these slides full-screen in a new tab]({PAGES_BASE}/{topic}.html)")

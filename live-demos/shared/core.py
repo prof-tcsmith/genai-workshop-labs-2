@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import os
 
 import streamlit as st
@@ -84,9 +85,40 @@ def get_client():
     return OpenAI(api_key=k)
 
 
+def ensure_access() -> None:
+    """Gate the app behind a participant code — but ONLY when one is configured.
+
+    On Streamlit Community Cloud, set ``workshop_passphrase_sha256`` (the SHA-256
+    hash of the code, never the code itself) in the app's Secrets to require it.
+    When no code is configured (e.g. local Docker), the gate is disabled so there
+    is zero friction running it yourself.
+    """
+    expected_hash = _secret("workshop_passphrase_sha256")
+    expected_plain = _secret("workshop_passphrase")  # local-dev fallback only
+    if not expected_hash and not expected_plain:
+        return
+    if st.session_state.get("_pass_ok"):
+        return
+    st.title("🔒 Enterprise AI — live demos")
+    st.caption("Enter the participant code from the workshop to continue.")
+    pw = st.text_input("Participant code", type="password")
+    if st.button("Enter"):
+        if expected_hash:
+            ok = hashlib.sha256(pw.encode("utf-8")).hexdigest() == str(expected_hash).strip().lower()
+        else:
+            ok = pw == expected_plain
+        if ok:
+            st.session_state["_pass_ok"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect code.")
+    st.stop()
+
+
 def boot(title: str):
-    """Top of every demo page: config, key entry, return a ready client (or stop)."""
+    """Top of every demo page: config, gate, key entry, return a ready client (or stop)."""
     st.set_page_config(page_title=title, page_icon="🎬", layout="wide")
+    ensure_access()
     render_key_sidebar()
     client = get_client()
     if client is None:

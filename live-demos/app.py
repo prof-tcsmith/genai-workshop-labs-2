@@ -1,8 +1,10 @@
 import streamlit as st
 
-from shared.core import render_key_sidebar, STACK
+from shared.core import render_key_sidebar, ensure_access, STACK
+from shared.slides import render_slides
 
 st.set_page_config(page_title="Live demos — Enterprise AI for IS Faculty", page_icon="🎬", layout="wide")
+ensure_access()
 render_key_sidebar()
 
 st.title("🎬 Enterprise AI — five progressive live demos")
@@ -10,6 +12,7 @@ st.write(
     "Each level adds **one** capability and lights up more of the 7-layer stack. "
     "Paste the workshop OpenAI key in the sidebar, then walk Levels 1 → 5 and watch what changes."
 )
+render_slides("overview", label="📊 Start here — the 7-layer stack (interactive)", expanded=True)
 
 if st.session_state.get("key"):
     st.success("Key connected. Open a level from the sidebar or the list below.")

@@ -1,5 +1,6 @@
 import streamlit as st
 from lib.llm import home_setup, CHAT_MODEL_DEFAULT
+from lib.slides import render_slides
 
 home_setup("Workshop labs — Enterprise AI for IS Faculty")
 
@@ -8,6 +9,7 @@ st.write(
     "Companion labs to the *Enterprise AI for IS Faculty* deck. "
     "These are the **do** to the deck's **show**: real LLM calls, real retrieval, a real agent, and a real attack."
 )
+render_slides("overview", label="📊 Start here — the 7-layer stack (interactive)", expanded=True)
 
 key = st.session_state.get("openai_key")
 if key:

@@ -426,84 +426,75 @@ function Deck({ topic: T }) {
 /* ========================== END ENGINE ========================== */
 
 /* ====================== CONTENT START (author this region) ====================== */
-/* Lab 4 — Red-team & govern an agent (closing lab). HR-policy agent: build it,
-   attack it, then turn on defense-in-depth controls and watch the attacks fail. */
+/* Define an Arch (architecture diagram) component using the SVG helpers + html`` and
+   inline <svg viewBox=...> ... </svg>. Define an interactive Viz component. Then build
+   TOPIC = { kicker, slides:[...] }. Slide fields:
+     h (heading, required), sub, bullets:[html strings], comp (a component like Arch/Viz),
+     note (html), warn (html — the shortcoming), next (text — the lab that fixes it), tag.
+   Put the architecture diagram on its own slide via comp:Arch. Aim for ~8 slides. */
 
-// Architecture: defense in depth. Attack vectors enter on the left and must pass
-// every control layer before reaching the agent; egress is checked and logged.
-function Arch() {
+// The 7-layer enterprise AI stack: 6 stacked layers + governance as a cross-cutting band.
+function Stack() {
+  const L = [
+    [1, "Experience", C.accent],
+    [2, "Orchestration", C.violet],
+    [3, "Model", C.accent2],
+    [4, "Retrieval & context", C.accent],
+    [5, "Enterprise systems", C.violet],
+    [6, "Data foundation", C.accent2],
+  ];
   return html`<div class="arch">
     <svg viewBox="0 0 720 250" role="img">
-      <!-- incoming attack vectors (left) -->
-      ${Box({x:12,y:48,w:132,h:46,lines:["Poisoned","document"],accent:C.danger,fs:12})}
-      ${Box({x:12,y:156,w:132,h:46,lines:["Malicious","user message"],accent:C.danger,fs:12})}
-      ${HArrow({x1:144,x2:198,y:71,color:C.danger})}
-      ${HArrow({x1:144,x2:198,y:179,color:C.danger})}
-      <!-- controls: defense in depth — the attack must pass every layer -->
-      <rect x="200" y="28" width="206" height="194" rx="12" fill="rgba(255,255,255,.03)" stroke=${C.line} stroke-width="1"/>
-      <text x="303" y="45" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill=${C.faint}>CONTROLS · DEFENSE IN DEPTH</text>
-      ${Box({x:214,y:55,w:178,h:42,lines:["Input / retrieval filter"],fill:"rgba(110,168,254,.10)",accent:C.accent,fs:11})}
-      ${Box({x:214,y:106,w:178,h:42,lines:["Tool RBAC · least privilege"],fill:"rgba(94,234,212,.10)",accent:C.accent2,fs:11})}
-      ${Box({x:214,y:157,w:178,h:42,lines:["Human approval gate"],fill:"rgba(167,139,250,.12)",accent:C.violet,fs:11})}
-      <!-- protected core: agent + tools -->
-      ${HArrow({x1:406,x2:438,y:125,color:C.faint})}
-      ${Box({x:440,y:100,w:140,h:50,lines:["Agent + tools","(HR-policy)"],accent:C.ok,fs:13})}
-      <!-- outbound egress checks -->
-      ${HArrow({x1:580,x2:600,y:125,color:C.faint})}
-      ${Box({x:602,y:74,w:104,h:46,lines:["Output","check"],accent:C.accent,fs:12})}
-      ${Box({x:602,y:150,w:104,h:46,lines:["Audit log"],accent:C.warn,fs:12})}
-      ${VArrow({y1:120,y2:150,x:654,color:C.faint})}
+      ${L.map(([n, name, c], i) => Box({x:40, y:18 + i*36, w:512, h:30, lines:[n + " · " + name], accent:c, fs:13}))}
+      ${Box({x:574, y:18, w:128, h:210, lines:["7 · Governance","(every layer)"], fill:"rgba(251,191,36,.10)", accent:C.warn, fs:12, color:C.warn})}
     </svg>
-    <div class="archcap">Attacks must pass every control — input filtering, least-privilege RBAC, human approval — then egress is checked and logged.</div>
+    <div class="archcap">Six layers from experience down to data — and governance (7) is cross-cutting: it wraps them all.</div>
   </div>`;
 }
 
-// Interactive: pick an attack + a control, see the verdict. Adapted from slides.html.
-function AttackMatrix() {
-  const M = {
-    "Prompt injection":  { "Input filtering":["Blocked","var(--ok)"],  "Tool RBAC":["Reduced","var(--warn)"], "Approval gate":["Reduced","var(--warn)"], "Audit only":["Exposed","var(--danger)"] },
-    "Data exfiltration": { "Input filtering":["Reduced","var(--warn)"], "Tool RBAC":["Blocked","var(--ok)"],   "Approval gate":["Reduced","var(--warn)"], "Audit only":["Reduced","var(--warn)"] },
-    "Unauthorized write":{ "Input filtering":["Exposed","var(--danger)"],"Tool RBAC":["Reduced","var(--warn)"], "Approval gate":["Blocked","var(--ok)"],  "Audit only":["Exposed","var(--danger)"] },
+// Interactive: pick a demo level, see which of the 7 layers light up (mirrors the app's layer badges).
+function LayerMap() {
+  const STACK = ["Experience","Orchestration","Model","Retrieval & context","Enterprise systems","Data foundation","Governance"];
+  const DEMOS = {
+    "L1 Chatbot": [1,3],
+    "L2 Memory + guardrails": [1,3,7],
+    "L3 Context": [3,4,6],
+    "L4 MCP + tools": [2,3,5],
+    "L5 A2A + governance": [2,7],
   };
-  const [a,setA]=useState("Prompt injection");
-  const [c,setC]=useState("Input filtering");
-  const [verdict,color]=M[a][c];
+  const [d, setD] = useState("L1 Chatbot");
+  const active = DEMOS[d];
   return html`<div class="viz">
-    <small class="muted">Attack</small>
-    <div class="seg">${Object.keys(M).map(k=>html`<button key=${k} class=${a===k?'on':''} onClick=${()=>setA(k)}>${k}</button>`)}</div>
-    <small class="muted" style=${{display:'block',marginTop:8}}>Control</small>
-    <div class="seg">${Object.keys(M[a]).map(k=>html`<button key=${k} class=${c===k?'on':''} onClick=${()=>setC(k)}>${k}</button>`)}</div>
-    <div style=${{marginTop:10}}><span class="pill" style=${{color,borderColor:color}}>${verdict}</span>
-      <small class="muted"> · no single control is enough — defense in depth.</small></div>
+    <div class="seg">${Object.keys(DEMOS).map(k => html`<button key=${k} class=${d===k?'on':''} onClick=${()=>setD(k)}>${k}</button>`)}</div>
+    <div style=${{display:'flex',flexWrap:'wrap',gap:'7px',marginTop:'11px'}}>
+      ${STACK.map((name, i) => {
+        const n = i + 1, on = active.includes(n);
+        return html`<span key=${n} class="pill" style=${{borderColor:on?'var(--accent2)':'var(--line)',color:on?'var(--accent2)':'var(--faint)',background:on?'rgba(94,234,212,.12)':'transparent'}}>${n + " · " + name}</span>`;
+      })}
+    </div>
+    <small class="muted" style=${{display:'block',marginTop:'11px'}}>Each demo adds one capability and lights up more of the stack — by Level 5 you've touched all seven.</small>
   </div>`;
 }
 
 const TOPIC = {
-  kicker: "Lab 4 · Governance · Layer 7",
+  kicker: "Enterprise AI · the 7-layer stack",
   slides: [
-    { h: "Build → attack → govern", sub: "Make an agent, try to break it, then defend it.",
-      bullets: ["Scenario: an <b>HR-policy agent</b> that answers staff questions and can act on policy systems."], tag:"scenario" },
-    { h: "What you'll do", tag:"the cool part", bullets: [
-      "<b>Attack it</b>: prompt injection via a poisoned policy doc.",
-      "Try <b>data exfiltration</b> and an <b>unauthorized write</b>.",
-      "Then flip on the controls — and watch the <b>same attacks get blocked</b>." ] },
-    { h: "Defense in depth", tag:"architecture", comp: Arch },
-    { h: "How agents fail", tag:"failure modes", bullets: [
-      "<b>Prompt injection</b> — untrusted content hijacks the instructions.",
-      "<b>Excessive agency</b> — more power than the task needs.",
-      "<b>Data leakage</b> — secrets surfaced to the wrong party.",
-      "Anchored by the <b>OWASP Top 10 for LLM Apps</b>." ] },
-    { h: "Attack vs. control", tag:"try it", sub:"Pick an attack and a control — see Blocked / Reduced / Exposed.", comp: AttackMatrix },
-    { h: "Govern it", tag:"try it", bullets: [
-      "<b>Tool permissioning</b> = the new RBAC.",
-      "<b>Approval gates</b> = the new change control.",
-      "<b>Reasoning traces</b> = the new audit log.",
-      "Map to <b>NIST AI RMF</b> · <b>ISO 42001</b> · <b>EU AI Act</b>." ] },
-    { h: "Governance is never \"done\"", tag:"shortcoming",
-      warn: "No single control is enough, and governance is never 'done' — new attacks, model/data drift, and evaluation are continuous.",
-      next: "Ongoing governance & the end-to-end case studies (the main workshop deck)" },
-    { h: "Why it matters", tag:"takeaway",
-      note: "<b>Autonomy made safe</b> is an extension of the IS governance you already teach — defense in depth, applied to agents." },
+    { h: "Enterprise AI is a stack, not a model", sub: "A shared map for the demos and labs that follow.", tag: "why a stack", bullets: [
+      "GenAI in the enterprise is a <b>system</b> — the model is just one layer of seven.",
+      "Most failures aren't model quality; they're the layers around it: data, retrieval, governance.",
+      "<b>80%+ of AI projects fail to reach production</b>, with data a recurring root cause (RAND, 2024)." ] },
+    { h: "The 7-layer stack", tag: "the map", comp: Stack },
+    { h: "How to read it", tag: "orientation", bullets: [
+      "<b>Layer 3 (the model)</b> is the smallest part of the work.",
+      "The leverage is in <b>4 retrieval</b> + <b>6 data</b>, and in <b>7 governance</b>.",
+      "<b>Governance is cross-cutting</b> — it wraps every layer, not a final step.",
+      "IS faculty already teach most of this: data management, systems, controls." ] },
+    { h: "Build it up, one capability at a time", tag: "the progression", sub: "Each demo adds ONE capability and lights up more of the stack.", comp: LayerMap },
+    { h: "What follows", tag: "the plan", bullets: [
+      "<b>Live demos</b> (show-and-tell): chatbot → memory + guardrails → context → MCP + tools → A2A + governance.",
+      "<b>Hands-on labs</b> (you build): grounding, build-&-break RAG, the agent loop, red-team & govern.",
+      "Every demo and lab points back to this same 7-layer map." ] },
+    { h: "The throughline", tag: "takeaway", note: "A model becomes a dependable <b>enterprise system</b> only when the layers around it — retrieval, data, orchestration, and governance — are deliberately engineered. <b>That's the workshop.</b>" },
   ],
 };
 /* ====================== CONTENT END ====================== */
