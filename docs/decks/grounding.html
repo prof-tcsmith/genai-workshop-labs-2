@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept deck</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.16);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;--ok:#34d399;--danger:#fb7185;}
+  *{box-sizing:border-box} html,body,#root{height:100%;margin:0}
+  body{background:
+      radial-gradient(900px 500px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(700px 460px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .deck{height:100%;display:flex;flex-direction:column;padding:14px 18px 8px}
+  .kick{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+  .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:auto}
+  h2{font-size:clamp(19px,3.2vw,28px);margin:0;line-height:1.12;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(13px,1.8vw,16px);margin:0}
+  ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  li{position:relative;padding-left:21px;font-size:clamp(12.5px,1.6vw,15px);line-height:1.4}
+  li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 9px rgba(110,168,254,.7)}
+  b{color:#fff}
+  .note{border-left:3px solid var(--accent2);background:rgba(94,234,212,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .warn{border-left:3px solid var(--warn);background:rgba(251,191,36,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .nextpill{display:inline-block;align-self:flex-start;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.5);
+    color:var(--violet);font-weight:600;border-radius:999px;padding:4px 12px;font-size:clamp(11.5px,1.4vw,14px)}
+  .anim{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{display:flex;align-items:center;gap:12px;padding-top:6px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .2s}
+  .dot.on{background:var(--accent2)}
+  .nav{display:flex;gap:6px}
+  button.nav-b{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:8px;width:30px;height:30px;font-size:15px}
+  button.nav-b:hover{border-color:var(--accent)} button.nav-b:disabled{opacity:.35;cursor:default}
+  .num{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  .arch{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:8px}
+  .arch svg{width:100%;height:auto;max-height:300px;display:block}
+  .archcap{color:var(--faint);font-size:12px;margin-top:4px}
+  /* widget helpers (used by interactive viz) */
+  .viz{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:11px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .meterlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  small.muted{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(React.createElement);
+
+/* ============================ ENGINE (do NOT edit) ============================ */
+const C = { ink:'#eaf0ff', muted:'#9fb0d6', faint:'#7283a8', line:'rgba(255,255,255,.22)',
+  panel:'#1b2748', accent:'#6ea8fe', accent2:'#5eead4', violet:'#a78bfa', ok:'#34d399', warn:'#fbbf24', danger:'#fb7185' };
+// SVG helpers for architecture diagrams — use these so all decks look consistent.
+function Box({x,y,w,h,lines=[],fill=C.panel,stroke=C.line,accent,fs=13,color=C.ink,rx=10}){
+  const a = Array.isArray(lines)?lines:[lines];
+  return html`<g>
+    <rect x=${x} y=${y} width=${w} height=${h} rx=${rx} fill=${fill} stroke=${accent||stroke} stroke-width=${accent?2.4:1.2}/>
+    ${a.map((ln,i)=>html`<text key=${i} x=${x+w/2} y=${y+h/2-(a.length-1)*0.62*fs+i*1.22*fs+0.34*fs}
+      text-anchor="middle" font-size=${fs} font-weight="700" fill=${color}>${ln}</text>`)}
+  </g>`;
+}
+function HArrow({x1,x2,y,color=C.faint,label}){
+  const d = x2>x1?1:-1;
+  return html`<g>
+    <g stroke=${color} fill=${color}><line x1=${x1} y1=${y} x2=${x2-d*9} y2=${y} stroke-width="2.2"/>
+      <polygon points=${`${x2},${y} ${x2-d*10},${y-5.5} ${x2-d*10},${y+5.5}`} stroke="none"/></g>
+    ${label?html`<text x=${(x1+x2)/2} y=${y-7} text-anchor="middle" font-size="11" fill=${C.muted}>${label}</text>`:''}
+  </g>`;
+}
+function VArrow({y1,y2,x,color=C.faint}){
+  const d = y2>y1?1:-1;
+  return html`<g stroke=${color} fill=${color}><line x1=${x} y1=${y1} x2=${x} y2=${y2-d*9} stroke-width="2.2"/>
+    <polygon points=${`${x},${y2} ${x-5.5},${y2-d*10} ${x+5.5},${y2-d*10}`} stroke="none"/></g>`;
+}
+function Deck({ topic: T }) {
+  const [i, setI] = useState(0);
+  const n = T.slides.length;
+  const go = d => setI(x => Math.max(0, Math.min(n-1, x+d)));
+  useEffect(() => {
+    const k = e => { if(e.key==='ArrowRight'||e.key===' ') go(1); if(e.key==='ArrowLeft') go(-1); };
+    window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
+  });
+  const s = T.slides[i], Comp = s.comp;
+  return html`<div class="deck">
+    <div class="kick">${T.kicker}${s.tag?html` · ${s.tag}`:''}</div>
+    <div class="stage anim" key=${i}>
+      <h2>${s.h}</h2>
+      ${s.sub?html`<p class="sub">${s.sub}</p>`:''}
+      ${s.bullets?html`<ul>${s.bullets.map((b,k)=>html`<li key=${k} dangerouslySetInnerHTML=${{__html:b}}></li>`)}</ul>`:''}
+      ${Comp?html`<${Comp}/>`:''}
+      ${s.note?html`<div class="note" dangerouslySetInnerHTML=${{__html:s.note}}></div>`:''}
+      ${s.warn?html`<div class="warn">⚠️ <b>Shortcoming:</b> <span dangerouslySetInnerHTML=${{__html:s.warn}}></span></div>`:''}
+      ${s.next?html`<div class="nextpill">▶ Next: ${s.next}</div>`:''}
+    </div>
+    <div class="foot">
+      <div class="dots">${T.slides.map((_,k)=>html`<span key=${k} class=${'dot'+(k===i?' on':'')} onClick=${()=>setI(k)}></span>`)}</div>
+      <span class="num">${i+1} / ${n}</span>
+      <div class="nav">
+        <button class="nav-b" onClick=${()=>go(-1)} disabled=${i===0}>‹</button>
+        <button class="nav-b" onClick=${()=>go(1)} disabled=${i===n-1}>›</button>
+      </div>
+    </div>
+  </div>`;
+}
+/* ========================== END ENGINE ========================== */
+
+/* ====================== CONTENT START (author this region) ====================== */
+/* Define an Arch (architecture diagram) component using the SVG helpers + html`` and
+   inline <svg viewBox=...> ... </svg>. Define an interactive Viz component. Then build
+   TOPIC = { kicker, slides:[...] }. Slide fields:
+     h (heading, required), sub, bullets:[html strings], comp (a component like Arch/Viz),
+     note (html), warn (html — the shortcoming), next (text — the lab that fixes it), tag.
+   Put the architecture diagram on its own slide via comp:Arch. Aim for ~8 slides. */
+
+function Arch() {
+  return html`<div class="arch">
+    <svg viewBox="0 0 720 220" role="img">
+      ${Box({x:24,y:90,w:150,h:46,lines:["User question"],accent:C.accent})}
+      ${HArrow({x1:174,x2:286,y:113,label:"ask"})}
+      ${Box({x:286,y:84,w:150,h:58,lines:["LLM","(model)"],accent:C.accent2})}
+      ${HArrow({x1:436,x2:548,y:113,label:"answer"})}
+      ${Box({x:548,y:90,w:150,h:46,lines:["User"],accent:C.accent})}
+      ${VArrow({y1:84,y2:34,x:340})}
+      ${HArrow({x1:340,x2:288,y:30,color:C.violet,label:"retrieve"})}
+      ${Box({x:88,y:8,w:200,h:46,lines:["Retriever → Policy docs"],accent:C.violet})}
+      ${VArrow({y1:142,y2:186,x:382})}
+      ${HArrow({x1:382,x2:434,y:190,color:C.warn,label:"tool call"})}
+      ${Box({x:434,y:166,w:210,h:46,lines:["Tool → Order system"],accent:C.warn})}
+    </svg>
+    <div class="archcap">The model draws on retrieved policy and calls a live tool, then returns a checkable answer.</div>
+  </div>`;
+}
+
+function GroundingMeter() {
+  const data = {
+    "Prompt":      { Grounding: 18, Verifiability: 10, Freshness: 22 },
+    "+ Retrieval": { Grounding: 72, Verifiability: 74, Freshness: 50 },
+    "+ Tool use":  { Grounding: 94, Verifiability: 96, Freshness: 96 },
+  };
+  const [m, setM] = useState("Prompt");
+  const color = v => v >= 75 ? "var(--ok)" : v >= 45 ? "var(--warn)" : "var(--danger)";
+  return html`<div class="viz">
+    <div class="seg">${Object.keys(data).map(k => html`<button key=${k} class=${m===k?'on':''} onClick=${()=>setM(k)}>${k}</button>`)}</div>
+    ${Object.entries(data[m]).map(([k,v]) => html`<div key=${k}>
+        <div class="meterlbl"><span>${k}</span><span>${v}%</span></div>
+        <div class="bar"><i style=${{width:v+'%',background:color(v)}}></i></div>
+      </div>`)}
+    <small class="muted">Same question — "Is order #4471 refundable?" — at three levels of grounding.</small>
+  </div>`;
+}
+
+const TOPIC = {
+  kicker: "Lab 1 · Grounding · Layers 3–4",
+  slides: [
+    { h: "Grounding: prompt → retrieval → tool-use",
+      sub: "Turning a guessing chatbot into one whose answers are checkable. Anchor question: \"Is order #4471 refundable for this enterprise customer?\"" },
+
+    { h: "What it does — the cool part", tag: "the payoff",
+      bullets: [
+        "<b>Prompt only:</b> a fluent guess — confident, but unverifiable.",
+        "<b>+ Retrieval:</b> the answer cites <b>your</b> refund policy.",
+        "<b>+ A tool:</b> reads the <b>live</b> order to check eligibility.",
+        "Result: <b>grounded, cited, current, and auditable.</b>",
+      ] },
+
+    { h: "Architecture", tag: "how it's wired", comp: Arch },
+
+    { h: "How it works", tag: "the mechanism",
+      bullets: [
+        "The model only knows what's in its <b>context window</b>.",
+        "<b>Retrieval</b> injects the right policy snippet into the prompt.",
+        "A <b>tool call</b> fetches live facts (the order record).",
+        "<b>Grounding</b> = tied to sources · <b>verifiability</b> = checkable · <b>freshness</b> = current.",
+      ] },
+
+    { h: "See it move", tag: "interactive", comp: GroundingMeter },
+
+    { h: "Try it in the lab", tag: "your turn",
+      bullets: [
+        "Run the same question in each mode: Prompt, +Retrieval, +Tool use.",
+        "Compare the answers side by side — what changes, and why.",
+        "Only the last mode can truly answer \"is #4471 eligible?\"",
+      ] },
+
+    { h: "Where it breaks", tag: "the catch",
+      warn: "We treated retrieval as magic. But retrieval is exactly where things break — bad chunking, stale or conflicting docs, and permission leaks all corrupt the answer before the model sees it.",
+      next: "Lab 2 — Build & break a RAG" },
+
+    { h: "Why it matters", tag: "the principle",
+      note: "Reliability comes from the <b>architecture around the model</b> — retrieval, tools, and logging — not a bigger model. This is squarely an IS problem: data quality, retrieval design, and governance are what make AI answers trustworthy and auditable." },
+  ],
+};
+/* ====================== CONTENT END ====================== */
+
+createRoot(document.getElementById('root')).render(html`<${Deck} topic=${TOPIC}/>`);
+</script>
+</body>
+</html>

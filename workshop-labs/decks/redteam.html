@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept deck</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.16);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;--ok:#34d399;--danger:#fb7185;}
+  *{box-sizing:border-box} html,body,#root{height:100%;margin:0}
+  body{background:
+      radial-gradient(900px 500px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(700px 460px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .deck{height:100%;display:flex;flex-direction:column;padding:14px 18px 8px}
+  .kick{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+  .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:auto}
+  h2{font-size:clamp(19px,3.2vw,28px);margin:0;line-height:1.12;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(13px,1.8vw,16px);margin:0}
+  ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  li{position:relative;padding-left:21px;font-size:clamp(12.5px,1.6vw,15px);line-height:1.4}
+  li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 9px rgba(110,168,254,.7)}
+  b{color:#fff}
+  .note{border-left:3px solid var(--accent2);background:rgba(94,234,212,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .warn{border-left:3px solid var(--warn);background:rgba(251,191,36,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .nextpill{display:inline-block;align-self:flex-start;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.5);
+    color:var(--violet);font-weight:600;border-radius:999px;padding:4px 12px;font-size:clamp(11.5px,1.4vw,14px)}
+  .anim{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{display:flex;align-items:center;gap:12px;padding-top:6px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .2s}
+  .dot.on{background:var(--accent2)}
+  .nav{display:flex;gap:6px}
+  button.nav-b{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:8px;width:30px;height:30px;font-size:15px}
+  button.nav-b:hover{border-color:var(--accent)} button.nav-b:disabled{opacity:.35;cursor:default}
+  .num{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  .arch{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:8px}
+  .arch svg{width:100%;height:auto;max-height:300px;display:block}
+  .archcap{color:var(--faint);font-size:12px;margin-top:4px}
+  /* widget helpers (used by interactive viz) */
+  .viz{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:11px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .meterlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  small.muted{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(React.createElement);
+
+/* ============================ ENGINE (do NOT edit) ============================ */
+const C = { ink:'#eaf0ff', muted:'#9fb0d6', faint:'#7283a8', line:'rgba(255,255,255,.22)',
+  panel:'#1b2748', accent:'#6ea8fe', accent2:'#5eead4', violet:'#a78bfa', ok:'#34d399', warn:'#fbbf24', danger:'#fb7185' };
+// SVG helpers for architecture diagrams — use these so all decks look consistent.
+function Box({x,y,w,h,lines=[],fill=C.panel,stroke=C.line,accent,fs=13,color=C.ink,rx=10}){
+  const a = Array.isArray(lines)?lines:[lines];
+  return html`<g>
+    <rect x=${x} y=${y} width=${w} height=${h} rx=${rx} fill=${fill} stroke=${accent||stroke} stroke-width=${accent?2.4:1.2}/>
+    ${a.map((ln,i)=>html`<text key=${i} x=${x+w/2} y=${y+h/2-(a.length-1)*0.62*fs+i*1.22*fs+0.34*fs}
+      text-anchor="middle" font-size=${fs} font-weight="700" fill=${color}>${ln}</text>`)}
+  </g>`;
+}
+function HArrow({x1,x2,y,color=C.faint,label}){
+  const d = x2>x1?1:-1;
+  return html`<g>
+    <g stroke=${color} fill=${color}><line x1=${x1} y1=${y} x2=${x2-d*9} y2=${y} stroke-width="2.2"/>
+      <polygon points=${`${x2},${y} ${x2-d*10},${y-5.5} ${x2-d*10},${y+5.5}`} stroke="none"/></g>
+    ${label?html`<text x=${(x1+x2)/2} y=${y-7} text-anchor="middle" font-size="11" fill=${C.muted}>${label}</text>`:''}
+  </g>`;
+}
+function VArrow({y1,y2,x,color=C.faint}){
+  const d = y2>y1?1:-1;
+  return html`<g stroke=${color} fill=${color}><line x1=${x} y1=${y1} x2=${x} y2=${y2-d*9} stroke-width="2.2"/>
+    <polygon points=${`${x},${y2} ${x-5.5},${y2-d*10} ${x+5.5},${y2-d*10}`} stroke="none"/></g>`;
+}
+function Deck({ topic: T }) {
+  const [i, setI] = useState(0);
+  const n = T.slides.length;
+  const go = d => setI(x => Math.max(0, Math.min(n-1, x+d)));
+  useEffect(() => {
+    const k = e => { if(e.key==='ArrowRight'||e.key===' ') go(1); if(e.key==='ArrowLeft') go(-1); };
+    window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
+  });
+  const s = T.slides[i], Comp = s.comp;
+  return html`<div class="deck">
+    <div class="kick">${T.kicker}${s.tag?html` · ${s.tag}`:''}</div>
+    <div class="stage anim" key=${i}>
+      <h2>${s.h}</h2>
+      ${s.sub?html`<p class="sub">${s.sub}</p>`:''}
+      ${s.bullets?html`<ul>${s.bullets.map((b,k)=>html`<li key=${k} dangerouslySetInnerHTML=${{__html:b}}></li>`)}</ul>`:''}
+      ${Comp?html`<${Comp}/>`:''}
+      ${s.note?html`<div class="note" dangerouslySetInnerHTML=${{__html:s.note}}></div>`:''}
+      ${s.warn?html`<div class="warn">⚠️ <b>Shortcoming:</b> <span dangerouslySetInnerHTML=${{__html:s.warn}}></span></div>`:''}
+      ${s.next?html`<div class="nextpill">▶ Next: ${s.next}</div>`:''}
+    </div>
+    <div class="foot">
+      <div class="dots">${T.slides.map((_,k)=>html`<span key=${k} class=${'dot'+(k===i?' on':'')} onClick=${()=>setI(k)}></span>`)}</div>
+      <span class="num">${i+1} / ${n}</span>
+      <div class="nav">
+        <button class="nav-b" onClick=${()=>go(-1)} disabled=${i===0}>‹</button>
+        <button class="nav-b" onClick=${()=>go(1)} disabled=${i===n-1}>›</button>
+      </div>
+    </div>
+  </div>`;
+}
+/* ========================== END ENGINE ========================== */
+
+/* ====================== CONTENT START (author this region) ====================== */
+/* Lab 4 — Red-team & govern an agent (closing lab). HR-policy agent: build it,
+   attack it, then turn on defense-in-depth controls and watch the attacks fail. */
+
+// Architecture: defense in depth. Attack vectors enter on the left and must pass
+// every control layer before reaching the agent; egress is checked and logged.
+function Arch() {
+  return html`<div class="arch">
+    <svg viewBox="0 0 720 250" role="img">
+      <!-- incoming attack vectors (left) -->
+      ${Box({x:12,y:48,w:132,h:46,lines:["Poisoned","document"],accent:C.danger,fs:12})}
+      ${Box({x:12,y:156,w:132,h:46,lines:["Malicious","user message"],accent:C.danger,fs:12})}
+      ${HArrow({x1:144,x2:198,y:71,color:C.danger})}
+      ${HArrow({x1:144,x2:198,y:179,color:C.danger})}
+      <!-- controls: defense in depth — the attack must pass every layer -->
+      <rect x="200" y="28" width="206" height="194" rx="12" fill="rgba(255,255,255,.03)" stroke=${C.line} stroke-width="1"/>
+      <text x="303" y="45" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="0.06em" fill=${C.faint}>CONTROLS · DEFENSE IN DEPTH</text>
+      ${Box({x:214,y:55,w:178,h:42,lines:["Input / retrieval filter"],fill:"rgba(110,168,254,.10)",accent:C.accent,fs:11})}
+      ${Box({x:214,y:106,w:178,h:42,lines:["Tool RBAC · least privilege"],fill:"rgba(94,234,212,.10)",accent:C.accent2,fs:11})}
+      ${Box({x:214,y:157,w:178,h:42,lines:["Human approval gate"],fill:"rgba(167,139,250,.12)",accent:C.violet,fs:11})}
+      <!-- protected core: agent + tools -->
+      ${HArrow({x1:406,x2:438,y:125,color:C.faint})}
+      ${Box({x:440,y:100,w:140,h:50,lines:["Agent + tools","(HR-policy)"],accent:C.ok,fs:13})}
+      <!-- outbound egress checks -->
+      ${HArrow({x1:580,x2:600,y:125,color:C.faint})}
+      ${Box({x:602,y:74,w:104,h:46,lines:["Output","check"],accent:C.accent,fs:12})}
+      ${Box({x:602,y:150,w:104,h:46,lines:["Audit log"],accent:C.warn,fs:12})}
+      ${VArrow({y1:120,y2:150,x:654,color:C.faint})}
+    </svg>
+    <div class="archcap">Attacks must pass every control — input filtering, least-privilege RBAC, human approval — then egress is checked and logged.</div>
+  </div>`;
+}
+
+// Interactive: pick an attack + a control, see the verdict. Adapted from slides.html.
+function AttackMatrix() {
+  const M = {
+    "Prompt injection":  { "Input filtering":["Blocked","var(--ok)"],  "Tool RBAC":["Reduced","var(--warn)"], "Approval gate":["Reduced","var(--warn)"], "Audit only":["Exposed","var(--danger)"] },
+    "Data exfiltration": { "Input filtering":["Reduced","var(--warn)"], "Tool RBAC":["Blocked","var(--ok)"],   "Approval gate":["Reduced","var(--warn)"], "Audit only":["Reduced","var(--warn)"] },
+    "Unauthorized write":{ "Input filtering":["Exposed","var(--danger)"],"Tool RBAC":["Reduced","var(--warn)"], "Approval gate":["Blocked","var(--ok)"],  "Audit only":["Exposed","var(--danger)"] },
+  };
+  const [a,setA]=useState("Prompt injection");
+  const [c,setC]=useState("Input filtering");
+  const [verdict,color]=M[a][c];
+  return html`<div class="viz">
+    <small class="muted">Attack</small>
+    <div class="seg">${Object.keys(M).map(k=>html`<button key=${k} class=${a===k?'on':''} onClick=${()=>setA(k)}>${k}</button>`)}</div>
+    <small class="muted" style=${{display:'block',marginTop:8}}>Control</small>
+    <div class="seg">${Object.keys(M[a]).map(k=>html`<button key=${k} class=${c===k?'on':''} onClick=${()=>setC(k)}>${k}</button>`)}</div>
+    <div style=${{marginTop:10}}><span class="pill" style=${{color,borderColor:color}}>${verdict}</span>
+      <small class="muted"> · no single control is enough — defense in depth.</small></div>
+  </div>`;
+}
+
+const TOPIC = {
+  kicker: "Lab 4 · Governance · Layer 7",
+  slides: [
+    { h: "Build → attack → govern", sub: "Make an agent, try to break it, then defend it.",
+      bullets: ["Scenario: an <b>HR-policy agent</b> that answers staff questions and can act on policy systems."], tag:"scenario" },
+    { h: "What you'll do", tag:"the cool part", bullets: [
+      "<b>Attack it</b>: prompt injection via a poisoned policy doc.",
+      "Try <b>data exfiltration</b> and an <b>unauthorized write</b>.",
+      "Then flip on the controls — and watch the <b>same attacks get blocked</b>." ] },
+    { h: "Defense in depth", tag:"architecture", comp: Arch },
+    { h: "How agents fail", tag:"failure modes", bullets: [
+      "<b>Prompt injection</b> — untrusted content hijacks the instructions.",
+      "<b>Excessive agency</b> — more power than the task needs.",
+      "<b>Data leakage</b> — secrets surfaced to the wrong party.",
+      "Anchored by the <b>OWASP Top 10 for LLM Apps</b>." ] },
+    { h: "Attack vs. control", tag:"try it", sub:"Pick an attack and a control — see Blocked / Reduced / Exposed.", comp: AttackMatrix },
+    { h: "Govern it", tag:"try it", bullets: [
+      "<b>Tool permissioning</b> = the new RBAC.",
+      "<b>Approval gates</b> = the new change control.",
+      "<b>Reasoning traces</b> = the new audit log.",
+      "Map to <b>NIST AI RMF</b> · <b>ISO 42001</b> · <b>EU AI Act</b>." ] },
+    { h: "Governance is never \"done\"", tag:"shortcoming",
+      warn: "No single control is enough, and governance is never 'done' — new attacks, model/data drift, and evaluation are continuous.",
+      next: "Ongoing governance & the end-to-end case studies (the main workshop deck)" },
+    { h: "Why it matters", tag:"takeaway",
+      note: "<b>Autonomy made safe</b> is an extension of the IS governance you already teach — defense in depth, applied to agents." },
+  ],
+};
+/* ====================== CONTENT END ====================== */
+
+createRoot(document.getElementById('root')).render(html`<${Deck} topic=${TOPIC}/>`);
+</script>
+</body>
+</html>
