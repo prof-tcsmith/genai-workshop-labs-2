@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept deck</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.16);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;--ok:#34d399;--danger:#fb7185;}
+  *{box-sizing:border-box} html,body,#root{height:100%;margin:0}
+  body{background:
+      radial-gradient(900px 500px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(700px 460px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .deck{height:100%;display:flex;flex-direction:column;padding:14px 18px 8px}
+  .kick{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+  .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:auto}
+  h2{font-size:clamp(19px,3.2vw,28px);margin:0;line-height:1.12;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(13px,1.8vw,16px);margin:0}
+  ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  li{position:relative;padding-left:21px;font-size:clamp(12.5px,1.6vw,15px);line-height:1.4}
+  li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 9px rgba(110,168,254,.7)}
+  b{color:#fff}
+  .note{border-left:3px solid var(--accent2);background:rgba(94,234,212,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .warn{border-left:3px solid var(--warn);background:rgba(251,191,36,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .nextpill{display:inline-block;align-self:flex-start;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.5);
+    color:var(--violet);font-weight:600;border-radius:999px;padding:4px 12px;font-size:clamp(11.5px,1.4vw,14px)}
+  .anim{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{display:flex;align-items:center;gap:12px;padding-top:6px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .2s}
+  .dot.on{background:var(--accent2)}
+  .nav{display:flex;gap:6px}
+  button.nav-b{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:8px;width:30px;height:30px;font-size:15px}
+  button.nav-b:hover{border-color:var(--accent)} button.nav-b:disabled{opacity:.35;cursor:default}
+  .num{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  .arch{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:8px}
+  .arch svg{width:100%;height:auto;max-height:300px;display:block}
+  .archcap{color:var(--faint);font-size:12px;margin-top:4px}
+  /* widget helpers (used by interactive viz) */
+  .viz{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:11px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .meterlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  small.muted{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(React.createElement);
+
+/* ============================ ENGINE (do NOT edit) ============================ */
+const C = { ink:'#eaf0ff', muted:'#9fb0d6', faint:'#7283a8', line:'rgba(255,255,255,.22)',
+  panel:'#1b2748', accent:'#6ea8fe', accent2:'#5eead4', violet:'#a78bfa', ok:'#34d399', warn:'#fbbf24', danger:'#fb7185' };
+// SVG helpers for architecture diagrams — use these so all decks look consistent.
+function Box({x,y,w,h,lines=[],fill=C.panel,stroke=C.line,accent,fs=13,color=C.ink,rx=10}){
+  const a = Array.isArray(lines)?lines:[lines];
+  return html`<g>
+    <rect x=${x} y=${y} width=${w} height=${h} rx=${rx} fill=${fill} stroke=${accent||stroke} stroke-width=${accent?2.4:1.2}/>
+    ${a.map((ln,i)=>html`<text key=${i} x=${x+w/2} y=${y+h/2-(a.length-1)*0.62*fs+i*1.22*fs+0.34*fs}
+      text-anchor="middle" font-size=${fs} font-weight="700" fill=${color}>${ln}</text>`)}
+  </g>`;
+}
+function HArrow({x1,x2,y,color=C.faint,label}){
+  const d = x2>x1?1:-1;
+  return html`<g>
+    <g stroke=${color} fill=${color}><line x1=${x1} y1=${y} x2=${x2-d*9} y2=${y} stroke-width="2.2"/>
+      <polygon points=${`${x2},${y} ${x2-d*10},${y-5.5} ${x2-d*10},${y+5.5}`} stroke="none"/></g>
+    ${label?html`<text x=${(x1+x2)/2} y=${y-7} text-anchor="middle" font-size="11" fill=${C.muted}>${label}</text>`:''}
+  </g>`;
+}
+function VArrow({y1,y2,x,color=C.faint}){
+  const d = y2>y1?1:-1;
+  return html`<g stroke=${color} fill=${color}><line x1=${x} y1=${y1} x2=${x} y2=${y2-d*9} stroke-width="2.2"/>
+    <polygon points=${`${x},${y2} ${x-5.5},${y2-d*10} ${x+5.5},${y2-d*10}`} stroke="none"/></g>`;
+}
+function Deck({ topic: T }) {
+  const [i, setI] = useState(0);
+  const n = T.slides.length;
+  const go = d => setI(x => Math.max(0, Math.min(n-1, x+d)));
+  useEffect(() => {
+    const k = e => { if(e.key==='ArrowRight'||e.key===' ') go(1); if(e.key==='ArrowLeft') go(-1); };
+    window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
+  });
+  const s = T.slides[i], Comp = s.comp;
+  return html`<div class="deck">
+    <div class="kick">${T.kicker}${s.tag?html` · ${s.tag}`:''}</div>
+    <div class="stage anim" key=${i}>
+      <h2>${s.h}</h2>
+      ${s.sub?html`<p class="sub">${s.sub}</p>`:''}
+      ${s.bullets?html`<ul>${s.bullets.map((b,k)=>html`<li key=${k} dangerouslySetInnerHTML=${{__html:b}}></li>`)}</ul>`:''}
+      ${Comp?html`<${Comp}/>`:''}
+      ${s.note?html`<div class="note" dangerouslySetInnerHTML=${{__html:s.note}}></div>`:''}
+      ${s.warn?html`<div class="warn">⚠️ <b>Shortcoming:</b> <span dangerouslySetInnerHTML=${{__html:s.warn}}></span></div>`:''}
+      ${s.next?html`<div class="nextpill">▶ Next: ${s.next}</div>`:''}
+    </div>
+    <div class="foot">
+      <div class="dots">${T.slides.map((_,k)=>html`<span key=${k} class=${'dot'+(k===i?' on':'')} onClick=${()=>setI(k)}></span>`)}</div>
+      <span class="num">${i+1} / ${n}</span>
+      <div class="nav">
+        <button class="nav-b" onClick=${()=>go(-1)} disabled=${i===0}>‹</button>
+        <button class="nav-b" onClick=${()=>go(1)} disabled=${i===n-1}>›</button>
+      </div>
+    </div>
+  </div>`;
+}
+/* ========================== END ENGINE ========================== */
+
+/* ====================== CONTENT START (author this region) ====================== */
+/* Level 4 — MCP + tools: an agent that can ACT.
+   Arch = the MCP client→server→tool dance: [Model = MCP client] ⇄ [MCP server
+   (list_tools/call_tool)] ⇄ [Tools: get_order · search_kb · calculator] →
+   [Enterprise systems], with explicit REQUEST/RESPONSE arrows and a loop-back arc.
+   McpLoop = interactive auto-cycling round-trip (adapted from agent.html's AgentLoop).
+   TOPIC = { kicker, slides:[...] }. */
+
+function Arch() {
+  return html`<div class="arch">
+    <svg viewBox="0 0 720 230" role="img">
+      <!-- Model = MCP client -->
+      ${Box({x:14,y:80,w:150,h:70,lines:["Model","(MCP client)"],accent:C.violet,fs:13})}
+      <!-- loop-back arc on the client: repeat until final answer -->
+      <path d="M 22 80 C 6 44 96 36 122 70" fill="none" stroke=${C.faint} stroke-width="2.2" stroke-dasharray="5 4"/>
+      <polygon points="122,70 110,66 117,57" fill=${C.faint}/>
+      <text x="70" y="30" text-anchor="middle" font-size="10" fill=${C.faint}>loop until final answer</text>
+
+      <!-- REQUEST (client → server) and RESPONSE (server → client) -->
+      ${HArrow({x1:164,x2:268,y:104,color:C.accent,label:"call_tool"})}
+      <text x="216" y="120" text-anchor="middle" font-size="10" fill=${C.accent}>REQUEST</text>
+      ${HArrow({x1:268,x2:164,y:140,color:C.accent2})}
+      <text x="216" y="160" text-anchor="middle" font-size="10" fill=${C.accent2}>RESPONSE (result)</text>
+
+      <!-- MCP server -->
+      ${Box({x:268,y:74,w:168,h:82,lines:["MCP server","list_tools / call_tool"],accent:C.accent,fs:13})}
+
+      <!-- server → tools -->
+      ${HArrow({x1:436,x2:498,y:115,label:"run"})}
+
+      <!-- Tools box -->
+      ${Box({x:498,y:54,w:208,h:122,lines:[],fill:"#16223f",stroke:C.line})}
+      <text x="602" y="74" text-anchor="middle" font-size="12" font-weight="700" fill=${C.accent2}>Tools</text>
+      ${Box({x:510,y:84,w:184,h:24,lines:["get_order · read"],fs:11,color:C.muted})}
+      ${Box({x:510,y:114,w:184,h:24,lines:["search_kb · read"],fs:11,color:C.muted})}
+      ${Box({x:510,y:144,w:184,h:24,lines:["calculator · compute"],fs:11,color:C.muted})}
+
+      <!-- tools reach into enterprise systems / data -->
+      ${VArrow({y1:176,x:602,y2:200})}
+      <text x="602" y="222" text-anchor="middle" font-size="11" fill=${C.faint}>Enterprise systems / data (orders · KB)</text>
+    </svg>
+    <div class="archcap">The model is the MCP client: it sends a <b>call_tool</b> REQUEST, the server runs the tool and returns a RESULT, and the client loops until it can give a final answer — collapsed into one process so every message is visible.</div>
+  </div>`;
+}
+
+function McpLoop() {
+  const steps = [
+    { label:"Client requests", tool:"call_tool: get_order", color:C.accent, msg:"REQUEST →" },
+    { label:"Server runs tool", tool:"get_order(4471)", color:C.violet, msg:"executing…" },
+    { label:"Result returns", tool:"← {status, days_ago}", color:C.accent2, msg:"RESPONSE ←" },
+    { label:"Final answer", tool:"no more tools — reply", color:C.ok, msg:"done ✓" },
+  ];
+  const [i, setI] = useState(0);
+  const [auto, setAuto] = useState(true);
+  useEffect(() => { if(!auto) return; const t=setInterval(()=>setI(x=>(x+1)%steps.length),1100); return ()=>clearInterval(t); }, [auto]);
+  const cur = steps[i];
+  return html`<div class="viz">
+    <div class="row">
+      ${steps.map((s,k)=>html`<span key=${k} class="row" style=${{gap:6}}>
+        <span class="pill" style=${k===i?{color:s.color,borderColor:s.color,background:'rgba(110,168,254,.12)',boxShadow:'0 0 16px rgba(94,234,212,.30)'}:{color:C.faint}}>${s.label}</span>
+        ${k<steps.length-1?html`<span style=${{color:C.faint}}>→</span>`:''}
+      </span>`)}
+      <span style=${{color:C.faint,fontSize:18}}>↻</span>
+    </div>
+    <div class="row" style=${{marginTop:12}}>
+      <span class="pill" style=${{color:cur.color,borderColor:cur.color}}>${cur.msg}</span>
+      <small class="muted">tool: <b style=${{color:cur.color}}>${cur.tool}</b></small>
+    </div>
+    <div class="row" style=${{marginTop:12}}>
+      <button class="nav-b" style=${{width:'auto',padding:'0 12px'}} onClick=${()=>{setAuto(false);setI(x=>(x+1)%steps.length);}}>Step ▸</button>
+      <button class="nav-b" style=${{width:'auto',padding:'0 12px'}} onClick=${()=>setAuto(a=>!a)}>${auto?'Pause':'Auto'}</button>
+      <small class="muted">…each request/response pair, until no more tools are needed.</small>
+    </div>
+  </div>`;
+}
+
+const TOPIC = {
+  kicker: "Level 4 · MCP + tools · Layers 2, 3, 5",
+  slides: [
+    { h: "An agent that can act",
+      sub: "From answering to doing — via tools." },
+
+    { h: "What it does", tag: "the cool part", bullets: [
+      "The <b>model decides</b> which tool to call — and with what arguments.",
+      "A small <b>server runs</b> it: <code>get_order</code>, <code>search_kb</code>, or <code>calculator</code>.",
+      "The <b>loop continues</b> until the model has enough to answer.",
+      "Every <b>MCP request &amp; response</b> is visible — the whole exchange." ] },
+
+    { h: "Architecture", tag: "how it fits together", comp: Arch },
+
+    { h: "How it works", tag: "under the hood", bullets: [
+      "The server advertises a <b>tool catalog</b> — names + JSON-schema params; the model sees exactly those.",
+      "The model emits a <b>tool call</b>; the server executes it and returns a <b>result message</b>.",
+      "A <b>max-steps cap</b> bounds the loop so it can't run forever.",
+      "<b>Reads</b> (<code>get_order</code>, <code>search_kb</code>) vs a <b>compute</b> tool (<code>calculator</code>)." ] },
+
+    { h: "Watch the round-trip", tag: "interactive", comp: McpLoop,
+      note: "Client <b>requests</b> → server <b>runs the tool</b> → <b>result returns</b> → repeat → <b>final answer</b>. Hit <b>Step</b> to advance one message, or let it <b>Auto</b>-cycle. The pill shows the current tool." },
+
+    { h: "Try it in the demo", tag: "hands-on", bullets: [
+      "Goal: <b>\"Is order 4471 within the refund window?\"</b> — then Run agent.",
+      "Watch each <b>MCP REQUEST / RESPONSE</b> pair appear, step by step.",
+      "Open <b>Full trace</b> and the <b>Raw message log</b> to see the <code>role:'tool'</code> replies.",
+      "Adjust <b>Max agent steps</b> and re-run to see the cap change the loop." ] },
+
+    { h: "Shortcoming", tag: "what's still missing",
+      warn: "It's a <b>single agent</b> and the tools run with <b>no governance</b> — any tool can be called, writes would execute autonomously, there's <b>no separation of duties</b>, <b>no human approval</b>, and <b>no audit trail</b>.",
+      next: "Level 5 — A2A + governance" },
+
+    { h: "Why it matters",
+      sub: "MCP is just a clean client/server contract for tools.",
+      note: "MCP is just a clean <b>client/server contract</b> for tools — <b>orchestration (Layer 2)</b> turns a model into something that <b>acts on enterprise systems (Layer 5)</b>. The real protocol-over-Docker version lives in the repo's <code>mcp-lab/</code>." },
+  ],
+};
+/* ====================== CONTENT END ====================== */
+
+createRoot(document.getElementById('root')).render(html`<${Deck} topic=${TOPIC}/>`);
+</script>
+</body>
+</html>

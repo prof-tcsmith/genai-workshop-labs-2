@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Concept deck</title>
+<style>
+  :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
+        --line:rgba(255,255,255,.16);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;--ok:#34d399;--danger:#fb7185;}
+  *{box-sizing:border-box} html,body,#root{height:100%;margin:0}
+  body{background:
+      radial-gradient(900px 500px at 85% -10%,rgba(110,168,254,.16),transparent 60%),
+      radial-gradient(700px 460px at -10% 110%,rgba(94,234,212,.12),transparent 55%),var(--bg);
+    color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+  .deck{height:100%;display:flex;flex-direction:column;padding:14px 18px 8px}
+  .kick{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+  .stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:auto}
+  h2{font-size:clamp(19px,3.2vw,28px);margin:0;line-height:1.12;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:clamp(13px,1.8vw,16px);margin:0}
+  ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  li{position:relative;padding-left:21px;font-size:clamp(12.5px,1.6vw,15px);line-height:1.4}
+  li::before{content:"";position:absolute;left:2px;top:.52em;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 9px rgba(110,168,254,.7)}
+  b{color:#fff}
+  .note{border-left:3px solid var(--accent2);background:rgba(94,234,212,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .warn{border-left:3px solid var(--warn);background:rgba(251,191,36,.10);border-radius:0 8px 8px 0;
+    padding:8px 12px;font-size:clamp(12px,1.55vw,14.5px)}
+  .nextpill{display:inline-block;align-self:flex-start;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.5);
+    color:var(--violet);font-weight:600;border-radius:999px;padding:4px 12px;font-size:clamp(11.5px,1.4vw,14px)}
+  .anim{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{display:flex;align-items:center;gap:12px;padding-top:6px}
+  .dots{display:flex;gap:6px;flex:1}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:background .2s}
+  .dot.on{background:var(--accent2)}
+  .nav{display:flex;gap:6px}
+  button.nav-b{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:8px;width:30px;height:30px;font-size:15px}
+  button.nav-b:hover{border-color:var(--accent)} button.nav-b:disabled{opacity:.35;cursor:default}
+  .num{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  .arch{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:8px}
+  .arch svg{width:100%;height:auto;max-height:300px;display:block}
+  .archcap{color:var(--faint);font-size:12px;margin-top:4px}
+  /* widget helpers (used by interactive viz) */
+  .viz{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:11px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+  .seg button{background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer;font-size:13px}
+  .seg button.on{background:rgba(94,234,212,.16);color:var(--accent2)}
+  .bar{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .meterlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  small.muted{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(React.createElement);
+
+/* ============================ ENGINE (do NOT edit) ============================ */
+const C = { ink:'#eaf0ff', muted:'#9fb0d6', faint:'#7283a8', line:'rgba(255,255,255,.22)',
+  panel:'#1b2748', accent:'#6ea8fe', accent2:'#5eead4', violet:'#a78bfa', ok:'#34d399', warn:'#fbbf24', danger:'#fb7185' };
+// SVG helpers for architecture diagrams — use these so all decks look consistent.
+function Box({x,y,w,h,lines=[],fill=C.panel,stroke=C.line,accent,fs=13,color=C.ink,rx=10}){
+  const a = Array.isArray(lines)?lines:[lines];
+  return html`<g>
+    <rect x=${x} y=${y} width=${w} height=${h} rx=${rx} fill=${fill} stroke=${accent||stroke} stroke-width=${accent?2.4:1.2}/>
+    ${a.map((ln,i)=>html`<text key=${i} x=${x+w/2} y=${y+h/2-(a.length-1)*0.62*fs+i*1.22*fs+0.34*fs}
+      text-anchor="middle" font-size=${fs} font-weight="700" fill=${color}>${ln}</text>`)}
+  </g>`;
+}
+function HArrow({x1,x2,y,color=C.faint,label}){
+  const d = x2>x1?1:-1;
+  return html`<g>
+    <g stroke=${color} fill=${color}><line x1=${x1} y1=${y} x2=${x2-d*9} y2=${y} stroke-width="2.2"/>
+      <polygon points=${`${x2},${y} ${x2-d*10},${y-5.5} ${x2-d*10},${y+5.5}`} stroke="none"/></g>
+    ${label?html`<text x=${(x1+x2)/2} y=${y-7} text-anchor="middle" font-size="11" fill=${C.muted}>${label}</text>`:''}
+  </g>`;
+}
+function VArrow({y1,y2,x,color=C.faint}){
+  const d = y2>y1?1:-1;
+  return html`<g stroke=${color} fill=${color}><line x1=${x} y1=${y1} x2=${x} y2=${y2-d*9} stroke-width="2.2"/>
+    <polygon points=${`${x},${y2} ${x-5.5},${y2-d*10} ${x+5.5},${y2-d*10}`} stroke="none"/></g>`;
+}
+function Deck({ topic: T }) {
+  const [i, setI] = useState(0);
+  const n = T.slides.length;
+  const go = d => setI(x => Math.max(0, Math.min(n-1, x+d)));
+  useEffect(() => {
+    const k = e => { if(e.key==='ArrowRight'||e.key===' ') go(1); if(e.key==='ArrowLeft') go(-1); };
+    window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
+  });
+  const s = T.slides[i], Comp = s.comp;
+  return html`<div class="deck">
+    <div class="kick">${T.kicker}${s.tag?html` · ${s.tag}`:''}</div>
+    <div class="stage anim" key=${i}>
+      <h2>${s.h}</h2>
+      ${s.sub?html`<p class="sub">${s.sub}</p>`:''}
+      ${s.bullets?html`<ul>${s.bullets.map((b,k)=>html`<li key=${k} dangerouslySetInnerHTML=${{__html:b}}></li>`)}</ul>`:''}
+      ${Comp?html`<${Comp}/>`:''}
+      ${s.note?html`<div class="note" dangerouslySetInnerHTML=${{__html:s.note}}></div>`:''}
+      ${s.warn?html`<div class="warn">⚠️ <b>Shortcoming:</b> <span dangerouslySetInnerHTML=${{__html:s.warn}}></span></div>`:''}
+      ${s.next?html`<div class="nextpill">▶ Next: ${s.next}</div>`:''}
+    </div>
+    <div class="foot">
+      <div class="dots">${T.slides.map((_,k)=>html`<span key=${k} class=${'dot'+(k===i?' on':'')} onClick=${()=>setI(k)}></span>`)}</div>
+      <span class="num">${i+1} / ${n}</span>
+      <div class="nav">
+        <button class="nav-b" onClick=${()=>go(-1)} disabled=${i===0}>‹</button>
+        <button class="nav-b" onClick=${()=>go(1)} disabled=${i===n-1}>›</button>
+      </div>
+    </div>
+  </div>`;
+}
+/* ========================== END ENGINE ========================== */
+
+/* ====================== CONTENT START (author this region) ====================== */
+/* Define an Arch (architecture diagram) component using the SVG helpers + html`` and
+   inline <svg viewBox=...> ... </svg>. Define an interactive Viz component. Then build
+   TOPIC = { kicker, slides:[...] }. Slide fields:
+     h (heading, required), sub, bullets:[html strings], comp (a component like Arch/Viz),
+     note (html), warn (html — the shortcoming), next (text — the lab that fixes it), tag.
+   Put the architecture diagram on its own slide via comp:Arch. Aim for ~8 slides. */
+
+// local helper: a straight arrow at ANY angle (connects boxes at different heights).
+function DArrow({x1,y1,x2,y2,color=C.faint,label,lx,ly}){
+  const a=Math.atan2(y2-y1,x2-x1),ux=Math.cos(a),uy=Math.sin(a),L=11,W=6,bx=x2-L*ux,by=y2-L*uy,px=-uy,py=ux;
+  return html`<g stroke=${color} fill=${color}>
+    <line x1=${x1} y1=${y1} x2=${bx} y2=${by} stroke-width="2.2"/>
+    <polygon stroke="none" points=${`${x2},${y2} ${bx+W*px},${by+W*py} ${bx-W*px},${by-W*py}`}/>
+    ${label?html`<text x=${lx??(x1+x2)/2} y=${ly??(y1+y2)/2-6} text-anchor="middle" font-size="11" fill=${C.muted} stroke="none">${label}</text>`:''}
+  </g>`;
+}
+
+function Arch() {
+  return html`<div class="arch">
+    <svg viewBox="0 0 720 250" role="img">
+      ${/* memory loop (top): the reply is appended to history, replayed next turn */''}
+      ${Box({x:406,y:22,w:170,h:40,lines:["Memory (history)"],accent:C.warn})}
+      ${Box({x:620,y:103,w:88,h:54,lines:["LLM →","reply"],accent:C.accent2,fs:12})}
+      ${DArrow({x1:636,y1:103,x2:579,y2:50,color:C.warn,label:"append",lx:628,ly:74})}
+      ${DArrow({x1:491,y1:62,x2:491,y2:101,color:C.warn,label:"replay",lx:524,ly:86})}
+
+      ${/* request path (middle): user turn → scope gate → context → model */''}
+      ${Box({x:10,y:103,w:116,h:54,lines:["New user","turn"],accent:C.accent})}
+      ${HArrow({x1:126,x2:190,y:130,label:"screen"})}
+      ${Box({x:190,y:103,w:158,h:54,lines:["Scope check","(separate LLM call)"],accent:C.violet,fs:11})}
+      ${HArrow({x1:348,x2:406,y:130,color:C.ok,label:"pass"})}
+      ${Box({x:406,y:103,w:170,h:54,lines:["System prompt","+ FULL history"],accent:C.accent2,fs:12})}
+      ${HArrow({x1:576,x2:620,y:130,label:"send"})}
+
+      ${/* block path (fail closed): the gate can stop the turn before the model runs */''}
+      ${VArrow({y1:157,y2:198,x:269,color:C.danger})}
+      ${Box({x:118,y:200,w:300,h:38,lines:["🚫 BLOCK — main model never called"],accent:C.danger,fs:12})}
+    </svg>
+    <div class="archcap">Each turn is gated by an independent scope check; on PASS the system prompt + full history go to the model, and the reply is appended to memory and replayed next turn.</div>
+  </div>`;
+}
+
+function ScopeGate() {
+  const samples = [
+    { msg: "How do I reset my password?", inScope: true },
+    { msg: "Why was I double-charged this month?", inScope: true },
+    { msg: "Write me a poem", inScope: false },
+    { msg: "How do I pick a lock?", inScope: false },
+  ];
+  const [on, setOn] = useState(true);
+  const [sel, setSel] = useState(0);
+  const s = samples[sel];
+  // With guardrails OFF, the scope gate is skipped — everything is answered.
+  const answered = on ? s.inScope : true;
+  const verdict = !on
+    ? { txt: "⚠️ guardrails OFF → answered (no scope check)", bg: "rgba(251,191,36,.16)", bd: C.warn, col: C.warn }
+    : s.inScope
+      ? { txt: "✅ in scope → answered", bg: "rgba(52,211,153,.16)", bd: C.ok, col: C.ok }
+      : { txt: "🚫 blocked → main model never called", bg: "rgba(251,113,133,.16)", bd: C.danger, col: C.danger };
+  return html`<div class="viz">
+    <div class="row" style=${{justifyContent:'space-between'}}>
+      <div class="seg">
+        <button class=${on?'on':''} onClick=${()=>setOn(true)}>Guardrails ON</button>
+        <button class=${!on?'on':''} onClick=${()=>setOn(false)}>OFF</button>
+      </div>
+      <span class="pill" style=${{background:verdict.bg,borderColor:verdict.bd,color:verdict.col}}>${verdict.txt}</span>
+    </div>
+    <div class="row" style=${{marginTop:'10px'}}>
+      ${samples.map((x,k)=>html`<button key=${k} class=${'pill'} onClick=${()=>setSel(k)}
+        style=${{cursor:'pointer',background:k===sel?'rgba(110,168,254,.18)':'transparent',
+                 borderColor:k===sel?C.accent:C.line,color:k===sel?C.ink:C.muted}}>
+        ${x.inScope?'🟢':'🔴'} ${x.msg}</button>`)}
+    </div>
+    <div style=${{marginTop:'11px',padding:'9px 12px',borderRadius:'8px',
+                  background:answered?'rgba(94,234,212,.08)':'rgba(251,113,133,.08)',
+                  border:'1px solid '+(answered?'rgba(94,234,212,.3)':'rgba(251,113,133,.35)')}}>
+      ${answered
+        ? html`<span><b>"${s.msg}"</b> → the Northwind bot answers.</span>`
+        : html`<span><b>"${s.msg}"</b> → the pre-flight gate fails closed and blocks it.</span>`}
+    </div>
+    <small class="muted">Same four messages, with the independent scope gate ON vs OFF. Canned logic — no network.</small>
+  </div>`;
+}
+
+const TOPIC = {
+  kicker: "Level 2 · Memory + guardrails · Layers 1, 3, 7",
+  slides: [
+    { h: "A narrow support bot that remembers",
+      sub: "Northwind Cloud support — and only that." },
+
+    { h: "What it does — the cool part", tag: "the payoff",
+      bullets: [
+        "<b>Remembers the whole conversation</b> — follow-ups just work.",
+        "<b>Stays on-task:</b> it's scoped to Northwind Cloud support.",
+        "<b>Refuses</b> off-topic or unsafe requests.",
+        "Toggle the guardrail <b>off</b> and watch it wander.",
+      ] },
+
+    { h: "Architecture", tag: "how it works", comp: Arch },
+
+    { h: "The two guardrails", tag: "defense in depth",
+      bullets: [
+        "<b>Guardrail 1</b> — a rule in the system prompt: necessary but <b>soft</b> (a clever message can talk the model out of it).",
+        "<b>Guardrail 2</b> — an <b>independent</b> classifier call that runs first and <b>fails closed</b>.",
+        "Production layers <b>both</b>, plus input/output filters & tool RBAC (Level 5).",
+      ],
+      note: "A guardrail is partly 'just a document in the prompt' — that's why you also need a separate, fail-closed gate." },
+
+    { h: "Try the scope gate", tag: "interactive", comp: ScopeGate },
+
+    { h: "Try it in the demo", tag: "your turn",
+      bullets: [
+        "Ask a Northwind question, then a follow-up like <b>\"and how do I undo that?\"</b> — memory follows along.",
+        "Ask something off-topic with guardrails <b>ON</b> vs <b>OFF</b>.",
+        "Open <b>🧠 Memory</b> to see the full replayed history.",
+      ] },
+
+    { h: "Where it falls short", tag: "the catch",
+      warn: "It only knows what's in the prompt and its memory — it has no access to real product knowledge, so detailed policy questions get vague or confidently wrong answers.",
+      next: "Level 3 — context engineering (grounding with retrieval)" },
+
+    { h: "Why it matters", tag: "the takeaway",
+      note: "Memory + guardrails are the difference between a toy and a scoped assistant — and the scope gate is where governance (Layer 7) first shows up." },
+  ],
+};
+/* ====================== CONTENT END ====================== */
+
+createRoot(document.getElementById('root')).render(html`<${Deck} topic=${TOPIC}/>`);
+</script>
+</body>
+</html>

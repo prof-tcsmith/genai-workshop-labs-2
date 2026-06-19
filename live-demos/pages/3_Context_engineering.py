@@ -9,6 +9,7 @@ import streamlit as st
 
 from shared import store
 from shared.core import boot, layer_badge, stream_assistant
+from shared.slides import render_slides
 
 client = boot("Level 3 · Context engineering")
 
@@ -19,6 +20,7 @@ st.caption(
     "then **engineer the prompt** around them (Layer 3). The model answers from what "
     "you give it — so context, not cleverness, drives quality."
 )
+render_slides("context")
 
 # --- 1. Information store: load corpus + build the index ONCE, cached in session ---
 # Building the index calls the embeddings API once; we guard so reruns reuse it.

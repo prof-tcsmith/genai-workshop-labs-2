@@ -20,6 +20,7 @@ import streamlit as st
 
 from shared import store
 from shared.core import boot, layer_badge, stream_assistant, tool_calls_to_message
+from shared.slides import render_slides
 
 client = boot("Level 4 · MCP + tools")
 
@@ -31,6 +32,7 @@ st.caption(
     "Layer 3 (model) decides which tool to use, Layer 5 (enterprise systems) is what "
     "the tools reach into — orders, the knowledge base, a calculator."
 )
+render_slides("mcp")
 
 # --- Mock enterprise data the tools reach into (Layer 5) ----------------------
 MOCK_ORDERS = {

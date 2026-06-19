@@ -11,6 +11,7 @@ Versus Level 1 (a bare chatbot) this page adds two visible things:
 import streamlit as st
 
 from shared.core import boot, chat, layer_badge, stream_assistant
+from shared.slides import render_slides
 
 client = boot("Level 2 · Memory + guardrails")
 
@@ -21,6 +22,7 @@ st.caption(
     "the conversation (Layer 1 experience + Layer 3 model) and is **scoped by a "
     "guardrail** (Layer 7 governance) so it stays on-task."
 )
+render_slides("memory")
 
 # --- The narrow persona (Layer 3): this is what makes the bot "narrow". --------
 SYSTEM_PROMPT = (

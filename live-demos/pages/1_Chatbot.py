@@ -1,12 +1,14 @@
 import streamlit as st
 
 from shared.core import boot, layer_badge, stream_assistant
+from shared.slides import render_slides
 
 client = boot("Level 1 · Chatbot")
 
 st.title("Level 1 · Chatbot")
 layer_badge([1, 3])
 st.caption("A system prompt + one message. **No memory. No guardrails.** This is all a bare chatbot is.")
+render_slides("chatbot")
 
 sys = st.text_area("System prompt (Layer 3 — how you steer the model)",
                    "You are a helpful, concise assistant.", height=80)

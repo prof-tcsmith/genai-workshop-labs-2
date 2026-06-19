@@ -21,6 +21,7 @@ import streamlit as st
 
 from shared import store
 from shared.core import boot, chat, layer_badge, stream_assistant, tool_calls_to_message
+from shared.slides import render_slides
 
 client = boot("Level 5 · A2A + governance")
 
@@ -31,6 +32,7 @@ st.caption(
     "step runs under governance (Layer 7): role-based tool access, a human "
     "approval gate, and an append-only audit log."
 )
+render_slides("governance")
 
 # --- Mock enterprise system (the "order DB") ---------------------------------
 ORDERS = {
