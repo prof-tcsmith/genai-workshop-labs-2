@@ -44,14 +44,22 @@ PG_USER = _secret("PG_USER", "course_app")
 PG_PASSWORD = _secret("PG_PASSWORD", "")
 PG_SSLMODE = _secret("PG_SSLMODE", "require")
 
+# Simplest setup: paste a single full connection string (Neon/Supabase give you
+# one). If set, it takes precedence over the individual PG_* parts above.
+DATABASE_URL = _secret("DATABASE_URL") or _secret("database_url")
+
 
 def pg_dsn() -> str:
-    """libpq connection string for psycopg."""
+    """A psycopg-compatible connection string (a URL, or libpq keywords)."""
+    if DATABASE_URL:
+        return DATABASE_URL
     return (f"host={PG_HOST} port={PG_PORT} dbname={PG_DB} "
             f"user={PG_USER} password={PG_PASSWORD} sslmode={PG_SSLMODE}")
 
 
 def pg_configured() -> bool:
+    if DATABASE_URL:
+        return True
     return bool(PG_HOST) and not str(PG_HOST).startswith("CHANGE-ME")
 
 
