@@ -457,10 +457,11 @@ function LayerMap() {
   const STACK = ["Experience","Orchestration","Model","Retrieval & context","Enterprise systems","Data foundation","Governance"];
   const DEMOS = {
     "L1 Chatbot": [1,3],
-    "L2 Memory + guardrails": [1,3,7],
-    "L3 Context": [3,4,6],
-    "L4 MCP + tools": [2,3,5],
-    "L5 A2A + governance": [2,7],
+    "L2 Memory": [1,3],
+    "L3 Guardrails": [1,3,7],
+    "L4 Context": [3,4,6],
+    "L5 MCP + tools": [2,3,5],
+    "L6 A2A + governance": [2,7],
   };
   const [d, setD] = useState("L1 Chatbot");
   const active = DEMOS[d];
@@ -472,7 +473,7 @@ function LayerMap() {
         return html`<span key=${n} class="pill" style=${{borderColor:on?'var(--accent2)':'var(--line)',color:on?'var(--accent2)':'var(--faint)',background:on?'rgba(94,234,212,.12)':'transparent'}}>${n + " · " + name}</span>`;
       })}
     </div>
-    <small class="muted" style=${{display:'block',marginTop:'11px'}}>Each demo adds one capability and lights up more of the stack — by Level 5 you've touched all seven.</small>
+    <small class="muted" style=${{display:'block',marginTop:'11px'}}>Each demo adds one capability and lights up more of the stack — by Level 6 you've touched all seven.</small>
   </div>`;
 }
 
@@ -491,7 +492,7 @@ const TOPIC = {
       "IS faculty already teach most of this: data management, systems, controls." ] },
     { h: "Build it up, one capability at a time", tag: "the progression", sub: "Each demo adds ONE capability and lights up more of the stack.", comp: LayerMap },
     { h: "What follows", tag: "the plan", bullets: [
-      "<b>Live demos</b> (show-and-tell): chatbot → memory + guardrails → context → MCP + tools → A2A + governance.",
+      "<b>Live demos</b> (show-and-tell): chatbot → memory → guardrails → context → MCP + tools → A2A + governance.",
       "<b>Hands-on labs</b> (you build): grounding, build-&-break RAG, the agent loop, red-team & govern.",
       "Every demo and lab points back to this same 7-layer map." ] },
     { h: "The throughline", tag: "takeaway", note: "A model becomes a dependable <b>enterprise system</b> only when the layers around it — retrieval, data, orchestration, and governance — are deliberately engineered. <b>That's the workshop.</b>" },

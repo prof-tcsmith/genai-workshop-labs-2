@@ -1,6 +1,6 @@
-"""Level 4 · MCP + tools — an agent that can ACT.
+"""Level 5 · MCP + tools — an agent that can ACT.
 
-Versus Level 3 (the model could only READ retrieved context) this page gives the
+Versus Level 4 (the model could only READ retrieved context) this page gives the
 model TOOLS it can call. The tools are advertised by a small in-process
 "MCP-style" server (`ToolServer`). The model plays the role of the MCP CLIENT:
 
@@ -22,9 +22,9 @@ from shared import store
 from shared.core import boot, layer_badge, stream_assistant, tool_calls_to_message
 from shared.slides import render_slides
 
-client = boot("Level 4 · MCP + tools")
+client = boot("Level 5 · MCP + tools")
 
-st.title("Level 4 · MCP + tools")
+st.title("Level 5 · MCP + tools")
 layer_badge([2, 3, 5])
 st.caption(
     "An **agent that can act**. The model is the MCP **client**; a small in-process "

@@ -426,7 +426,7 @@ function Deck({ topic: T }) {
 /* ========================== END ENGINE ========================== */
 
 /* ====================== CONTENT START (author this region) ====================== */
-/* Level 4 — MCP + tools: an agent that can ACT.
+/* Level 5 — MCP + tools: an agent that can ACT.
    Arch = the MCP client→server→tool dance: [Model = MCP client] ⇄ [MCP server
    (list_tools/call_tool)] ⇄ [Tools: get_order · search_kb · calculator] →
    [Enterprise systems], with explicit REQUEST/RESPONSE arrows and a loop-back arc.
@@ -502,7 +502,7 @@ function McpLoop() {
 }
 
 const TOPIC = {
-  kicker: "Level 4 · MCP + tools · Layers 2, 3, 5",
+  kicker: "Level 5 · MCP + tools · Layers 2, 3, 5",
   slides: [
     { h: "An agent that can act",
       sub: "From answering to doing — via tools." },
@@ -532,7 +532,7 @@ const TOPIC = {
 
     { h: "Shortcoming", tag: "what's still missing",
       warn: "It's a <b>single agent</b> and the tools run with <b>no governance</b> — any tool can be called, writes would execute autonomously, there's <b>no separation of duties</b>, <b>no human approval</b>, and <b>no audit trail</b>.",
-      next: "Level 5 — A2A + governance" },
+      next: "Level 6 — A2A + governance" },
 
     { h: "Why it matters",
       sub: "MCP is just a clean client/server contract for tools.",

@@ -1,4 +1,4 @@
-"""Level 3 · Context engineering + information store (RAG).
+"""Level 4 · Context engineering + information store (RAG).
 
 Teaching point: the *answer* is only as good as the *context you assemble*.
 We retrieve relevant chunks, then EXPLICITLY build the prompt around them so
@@ -11,9 +11,9 @@ from shared import store
 from shared.core import boot, layer_badge, stream_assistant
 from shared.slides import render_slides
 
-client = boot("Level 3 · Context engineering")
+client = boot("Level 4 · Context engineering")
 
-st.title("Level 3 · Context engineering (RAG)")
+st.title("Level 4 · Context engineering (RAG)")
 layer_badge([3, 4, 6])
 st.caption(
     "Retrieve the right snippets (Layer 4) from a small information store (Layer 6), "

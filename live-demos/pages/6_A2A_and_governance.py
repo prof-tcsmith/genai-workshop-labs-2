@@ -1,4 +1,4 @@
-"""Level 5 · Agent-to-agent (A2A) collaboration + governance.
+"""Level 6 · Agent-to-agent (A2A) collaboration + governance.
 
 Three specialised agents collaborate to handle a customer REFUND end-to-end,
 under explicit governance. Everything is OBSERVABLE in the UI:
@@ -23,9 +23,9 @@ from shared import store
 from shared.core import boot, chat, layer_badge, stream_assistant, tool_calls_to_message
 from shared.slides import render_slides
 
-client = boot("Level 5 · A2A + governance")
+client = boot("Level 6 · A2A + governance")
 
-st.title("Level 5 · Agent-to-agent + governance")
+st.title("Level 6 · Agent-to-agent + governance")
 layer_badge([2, 7])
 st.caption(
     "Multiple agents (Layer 2 orchestration) collaborate on a refund — but every "

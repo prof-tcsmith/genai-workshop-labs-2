@@ -481,8 +481,14 @@ function PersonaViz() {
 const TOPIC = {
   kicker: "Level 1 · Chatbot · Layers 1 & 3",
   slides: [
-    { h: "The bare chatbot",
-      sub: "A system prompt + one message. Nothing else." },
+    { h: "ChatGPT is an app, not the model", tag: "the reframe",
+      sub: "The LLM is one layer inside the app. The simplest app is a system prompt + your message.",
+      bullets: [
+        "<b>ChatGPT</b> is an application; <b>gpt-4o-mini</b> is just the model it calls.",
+        "An app wraps the model with <b>standing instructions</b> + <b>what you type</b>.",
+        "The simplest app: <b>system prompt</b> (Layer 3) + <b>user prompt</b> (Layer 1) → model.",
+        "Here there is no extra code — <b>you are the app</b>, assembling the two messages.",
+      ] },
 
     { h: "What it does — the cool part", tag: "the payoff",
       bullets: [
@@ -497,8 +503,8 @@ const TOPIC = {
     { h: "How it works", tag: "the mechanism",
       bullets: [
         "<b>System prompt</b> = how you steer the model (Layer 3).",
-        "<b>User message</b> = the experience (Layer 1).",
-        "The model sees <b>only these two messages</b> — nothing more.",
+        "<b>User message</b> = what the person types (Layer 1).",
+        "The <b>app</b> sends both to the model, which sees <b>only these two</b>.",
         "It is <b>stateless</b> — nothing carries over between sends.",
       ] },
 
@@ -512,11 +518,11 @@ const TOPIC = {
       ] },
 
     { h: "Where it breaks", tag: "the catch",
-      warn: "<b>No memory</b> — it forgets the previous turn. <b>No guardrails</b> — it will attempt whatever the prompt allows, including going off-topic.",
-      next: "Level 2 — memory + guardrails" },
+      warn: "<b>No memory</b> — each request is independent; send another message and it can't recall this one.",
+      next: "Level 2 — Memory" },
 
     { h: "Why it matters", tag: "the principle",
-      note: "Most 'AI features' are just <b>a system prompt + a message</b>. Understanding this baseline is what makes the next four levels legible — every layer you add is a deliberate answer to a limit you just saw here." },
+      note: "Most 'AI features' are just <b>an app wrapping the model</b> — at its simplest, a system prompt + a message. Understanding this baseline makes the next five levels legible: every layer you add is a deliberate answer to a limit you just saw here, starting with memory." },
   ],
 };
 /* ====================== CONTENT END ====================== */

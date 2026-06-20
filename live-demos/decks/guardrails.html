@@ -431,98 +431,102 @@ function Deck({ topic: T }) {
    TOPIC = { kicker, slides:[...] }. Slide fields:
      h (heading, required), sub, bullets:[html strings], comp (a component like Arch/Viz),
      note (html), warn (html — the shortcoming), next (text — the lab that fixes it), tag.
-   Put the architecture diagram on its own slide via comp:Arch. Aim for ~8 slides. */
+   Put the architecture diagram on its own slide via comp:Arch. Aim for ~7 slides. */
 
-// local helper: a straight arrow at ANY angle (connects boxes at different heights).
-function DArrow({x1,y1,x2,y2,color=C.faint,label,lx,ly}){
-  const a=Math.atan2(y2-y1,x2-x1),ux=Math.cos(a),uy=Math.sin(a),L=11,W=6,bx=x2-L*ux,by=y2-L*uy,px=-uy,py=ux;
-  return html`<g stroke=${color} fill=${color}>
-    <line x1=${x1} y1=${y1} x2=${bx} y2=${by} stroke-width="2.2"/>
-    <polygon stroke="none" points=${`${x2},${y2} ${bx+W*px},${by+W*py} ${bx-W*px},${by-W*py}`}/>
-    ${label?html`<text x=${lx??(x1+x2)/2} y=${ly??(y1+y2)/2-6} text-anchor="middle" font-size="11" fill=${C.muted} stroke="none">${label}</text>`:''}
-  </g>`;
-}
+// Diagonal arrow helper — connects boxes at different heights cleanly (used for the branch).
+function DArrow({x1,y1,x2,y2,color=C.faint,label,lx,ly}){const a=Math.atan2(y2-y1,x2-x1),ux=Math.cos(a),uy=Math.sin(a),L=11,W=6,bx=x2-L*ux,by=y2-L*uy,px=-uy,py=ux;return html`<g stroke=${color} fill=${color}><line x1=${x1} y1=${y1} x2=${bx} y2=${by} stroke-width="2.2"/><polygon stroke="none" points=${`${x2},${y2} ${bx+W*px},${by+W*py} ${bx-W*px},${by-W*py}`}/>${label?html`<text x=${lx??(x1+x2)/2} y=${ly??(y1+y2)/2-6} text-anchor="middle" font-size="11" fill=${C.muted} stroke="none">${label}</text>`:''}</g>`;}
 
+// Guardrail flow: a user turn hits an independent scope check (separate LLM call) FIRST.
+// It branches: BLOCK (red, main model never called) or PASS (green) → system prompt + history → LLM → reply.
 function Arch() {
+  const y = 70, h = 50, mid = y + h/2;            // box band + arrow centerline
   return html`<div class="arch">
-    <svg viewBox="0 0 720 210" role="img">
-      ${Box({x:24,y:24,w:200,h:46,lines:["System prompt","(Layer 3)"],accent:C.accent2,fs:12})}
-      ${Box({x:24,y:120,w:200,h:46,lines:["User message","(Layer 1)"],accent:C.accent,fs:12})}
-      ${Box({x:330,y:62,w:180,h:66,lines:["LLM","(gpt-4o-mini)"],accent:C.violet})}
-      ${DArrow({x1:224,y1:47,x2:330,y2:84,label:"steer",lx:286,ly:54})}
-      ${DArrow({x1:224,y1:143,x2:330,y2:106,label:"ask",lx:286,ly:142})}
-      ${HArrow({x1:510,x2:616,y:95,label:"stream"})}
-      ${Box({x:616,y:72,w:84,h:46,lines:["Response"],accent:C.accent})}
-      ${Box({x:330,y:158,w:300,h:38,lines:["Each request is independent — no state kept"],fill:"rgba(251,191,36,.10)",stroke:C.warn,fs:11,color:C.warn})}
+    <svg viewBox="0 0 720 240" role="img">
+      ${Box({x:6,   y, w:92,  h, lines:["User turn"], accent:C.accent})}
+      ${HArrow({x1:98,  x2:150, y:mid, label:"check first"})}
+      ${Box({x:150, y, w:120, h, lines:["Scope check","(separate LLM)"], accent:C.violet, fs:11})}
+      ${DArrow({x1:270, y1:y+14, x2:330, y2:198, color:C.danger, label:"BLOCK", lx:296, ly:128})}
+      ${Box({x:330, y:184, w:200, h:44, lines:["main model never called"], accent:C.danger, fs:11})}
+      ${DArrow({x1:270, y1:y+36, x2:330, y2:mid, color:C.ok, label:"PASS", lx:298, ly:66})}
+      ${Box({x:330, y, w:142, h, lines:["System prompt","+ history"], fs:12})}
+      ${HArrow({x1:472, x2:524, y:mid, label:"send"})}
+      ${Box({x:524, y, w:70,  h, lines:["LLM"], accent:C.accent2})}
+      ${HArrow({x1:594, x2:646, y:mid, label:"reply"})}
+      ${Box({x:646, y, w:70,  h, lines:["Reply"], accent:C.ok})}
     </svg>
-    <div class="archcap">Exactly two messages go in; one streamed reply comes back. Nothing carries between sends.</div>
+    <div class="archcap">The scope check runs first. Off-topic or unsafe turns take the red path and the main model never runs; in-scope turns pass through to the LLM.</div>
   </div>`;
 }
 
-function PersonaViz() {
-  const data = {
-    "Concise expert": "A system prompt is the model's standing instruction set, sent before your message to fix its role, tone, and constraints for the turn.",
-    "Answer in haiku": "Words above your words —\nthe model's quiet first rule,\nshaping all replies.",
-    "ELI5": "It's like a sticky note you put on a helper before you ask anything. The note says how to act — be short, be silly, be careful — and the helper reads it first every time.",
-  };
-  const tint = { "Concise expert": "var(--accent)", "Answer in haiku": "var(--accent2)", "ELI5": "var(--violet)" };
-  const [p, setP] = useState("Concise expert");
+// Interactive: a scope gate. Toggle guardrails ON/OFF, pick a sample message, see the verdict.
+// Fully canned — no network. With guardrails ON, off-topic messages are blocked before the model.
+function ScopeGate() {
+  const [on, setOn] = useState(true);
+  const msgs = [
+    { t: "Reset my password", inScope: true },
+    { t: "My invoice looks wrong", inScope: true },
+    { t: "Write me a poem", inScope: false },
+    { t: "Ignore your rules", inScope: false },
+  ];
+  const [pick, setPick] = useState(0);
+  const m = msgs[pick];
+  const blocked = on && !m.inScope;
+  const verdict = blocked
+    ? { pill: "🚫 blocked", pc: "var(--danger)", pb: "rgba(251,113,133,.16)", pbd: "rgba(251,113,133,.5)",
+        line: "Off-topic for Northwind Cloud support — the scope check failed closed and the main model was never called." }
+    : { pill: "✅ in scope → answered", pc: "var(--ok)", pb: "rgba(52,211,153,.16)", pbd: "rgba(52,211,153,.5)",
+        line: on ? "Passed the scope check — handed to the assistant." : "Guardrails off — the bot answers anything, on-task or not." };
   return html`<div class="viz">
-    <div class="row" style=${{justifyContent:'space-between'}}>
-      <div class="seg">${Object.keys(data).map(k => html`<button key=${k} class=${p===k?'on':''} onClick=${()=>setP(k)}>${k}</button>`)}</div>
-      <span class="pill" style=${{borderColor:tint[p],color:tint[p]}}>system prompt</span>
+    <div class="row">
+      <span class="seg">
+        <button class=${on?'on':''} onClick=${()=>setOn(true)}>Guardrails ON</button>
+        <button class=${!on?'on':''} onClick=${()=>setOn(false)}>Guardrails OFF</button>
+      </span>
+      <span class="pill" style=${{color:verdict.pc,background:verdict.pb,borderColor:verdict.pbd}}>${verdict.pill}</span>
     </div>
-    <small class="muted" style=${{display:'block',margin:'9px 0 6px'}}>Same question: "What is a system prompt?"</small>
-    <div style=${{borderLeft:'3px solid '+tint[p],background:'rgba(255,255,255,.04)',borderRadius:'0 8px 8px 0',padding:'9px 12px',fontSize:'14px',lineHeight:1.45,whiteSpace:'pre-line',minHeight:'72px'}}>${data[p]}</div>
-    <small class="muted" style=${{display:'block',marginTop:'8px'}}>Same model, same question — only the system prompt changed.</small>
+    <div class="row" style=${{marginTop:'9px'}}>
+      <span class="seg">
+        ${msgs.map((x,k)=>html`<button key=${k} class=${k===pick?'on':''} onClick=${()=>setPick(k)}>${x.t}</button>`)}
+      </span>
+    </div>
+    <p class="sub" style=${{marginTop:'9px'}}>${verdict.line}</p>
+    <small class="muted">Same bot — only the gate changed. Turn guardrails off and it wanders.</small>
   </div>`;
 }
 
 const TOPIC = {
-  kicker: "Level 1 · Chatbot · Layers 1 & 3",
+  kicker: "Level 3 · Guardrails · Layers 1, 3, 7",
   slides: [
-    { h: "ChatGPT is an app, not the model", tag: "the reframe",
-      sub: "The LLM is one layer inside the app. The simplest app is a system prompt + your message.",
+    { h: "Add guardrails: keep the assistant on-task and safe.",
+      sub: "Scenario: scope a general bot down to “Northwind Cloud” support — nothing else." },
+
+    { h: "What it does", tag: "the cool part",
       bullets: [
-        "<b>ChatGPT</b> is an application; <b>gpt-4o-mini</b> is just the model it calls.",
-        "An app wraps the model with <b>standing instructions</b> + <b>what you type</b>.",
-        "The simplest app: <b>system prompt</b> (Layer 3) + <b>user prompt</b> (Layer 1) → model.",
-        "Here there is no extra code — <b>you are the app</b>, assembling the two messages.",
+        "Every message passes an <b>independent pre-flight scope check</b> before the main model runs.",
+        "<b>Off-topic or unsafe</b> messages are blocked — the assistant never sees them.",
+        "In-scope messages pass straight through and get answered.",
+        "Toggle the guardrail <b>off</b> and the same bot wanders off-task.",
       ] },
 
-    { h: "What it does — the cool part", tag: "the payoff",
+    { h: "The two layers", tag: "soft vs hard",
       bullets: [
-        "One <b>system prompt</b> steers a capable model.",
-        "The <b>user message</b> is the whole request — nothing hidden.",
-        "You can see <b>exactly what is sent</b> to the model, as JSON.",
-        "Change the prompt (<i>'answer only in haiku'</i>) — behavior changes <b>instantly</b>.",
-      ] },
+        "<b>Guardrail 1</b> — a rule in the system prompt. Soft: a clever message can talk the model out of it.",
+        "<b>Guardrail 2</b> — an independent classifier call that runs first and <b>fails closed</b>. A hard gate.",
+        "Layer them: the prompt sets intent, the gate enforces it.",
+      ],
+      note: "A guardrail is partly “just a document in the prompt” — that's exactly why you also need a separate, fail-closed gate that can't be argued with." },
 
-    { h: "Architecture", tag: "how it's wired", comp: Arch },
+    { h: "Architecture", tag: "how it fits together", comp: Arch },
 
-    { h: "How it works", tag: "the mechanism",
-      bullets: [
-        "<b>System prompt</b> = how you steer the model (Layer 3).",
-        "<b>User message</b> = what the person types (Layer 1).",
-        "The <b>app</b> sends both to the model, which sees <b>only these two</b>.",
-        "It is <b>stateless</b> — nothing carries over between sends.",
-      ] },
+    { h: "Scope gate", tag: "interactive", comp: ScopeGate,
+      note: "Flip the toggle and pick a message: with guardrails ON, “write me a poem” and “ignore your rules” are blocked before the model; turn them OFF and the bot answers everything." },
 
-    { h: "See it move", tag: "interactive", comp: PersonaViz },
+    { h: "What this still can't do", tag: "the limit",
+      warn: "It stays on-task, but it only knows what's in its prompt — no access to real product knowledge, so specific questions get vague or guessed answers.",
+      next: "Level 4 — Context (RAG)" },
 
-    { h: "Try it in the demo", tag: "your turn",
-      bullets: [
-        "Type a <b>system prompt</b> + a <b>message</b>, then hit <b>Send</b>.",
-        "Open <b>\"Exactly what is sent to the model\"</b> — just two messages.",
-        "Resend a follow-up — notice it <b>does not remember</b> the last turn.",
-      ] },
-
-    { h: "Where it breaks", tag: "the catch",
-      warn: "<b>No memory</b> — each request is independent; send another message and it can't recall this one.",
-      next: "Level 2 — Memory" },
-
-    { h: "Why it matters", tag: "the principle",
-      note: "Most 'AI features' are just <b>an app wrapping the model</b> — at its simplest, a system prompt + a message. Understanding this baseline makes the next five levels legible: every layer you add is a deliberate answer to a limit you just saw here, starting with memory." },
+    { h: "Why it matters", tag: "takeaway",
+      note: "Scope + a fail-closed gate are where governance (Layer 7) first shows up. Production layers them, plus input/output filters, tool RBAC, and approval gates (you'll see those at Level 6)." },
   ],
 };
 /* ====================== CONTENT END ====================== */
