@@ -514,7 +514,7 @@ const TOPIC = {
       note: "This is the whole workshop in one app: <b>retrieval</b> + <b>structure</b> + <b>grounded generation</b> + a <b>human in the loop</b> + a real export." },
 
     { h: "What it does", tag: "the five steps", bullets: [
-      "<b>1 · Upload &amp; ingest</b> — PDFs, PowerPoint, HTML, Markdown → Pinecone.",
+      "<b>1 · Upload & ingest</b> — PDFs, PowerPoint, HTML, Markdown → Pinecone.",
       "<b>2 · Target</b> — pick a course objective + rubric from Postgres.",
       "<b>3 · Generate</b> — quiz/assignment items grounded in your material.",
       "<b>4 · Review</b> → <b>5 · Export</b> — accept items, download a Canvas QTI .zip." ] },
@@ -528,7 +528,7 @@ const TOPIC = {
       "<b>Human in the loop</b>: each item is edited / accepted / rejected before export." ] },
 
     { h: "Question types → QTI", tag: "import-clean for Canvas", bullets: [
-      "<b>Multiple choice</b> &amp; <b>multiple answer</b> → <code>response_lid</code> + scored key.",
+      "<b>Multiple choice</b> & <b>multiple answer</b> → <code>response_lid</code> + scored key.",
       "<b>True/False</b> → two-choice <code>response_lid</code>.",
       "<b>Short answer</b> → <code>response_str</code> with accepted answers.",
       "<b>Essay</b> → <code>response_str</code>, graded manually — packaged as a QTI 1.2 .zip." ] },
@@ -536,7 +536,7 @@ const TOPIC = {
     { h: "Build a quiz", tag: "interactive", comp: Viz,
       note: "Step through <b>Source → Item → Review → Export</b>. The item is grounded in a real cited passage, and <b>nothing exports until a human accepts it</b>." },
 
-    { h: "Governance &amp; payoff", tag: "why faculty can trust it",
+    { h: "Governance & payoff", tag: "why faculty can trust it",
       bullets: [
         "Every item is <b>traceable</b> to a source passage — auditable, not a black box.",
         "<b>Nothing is auto-published</b>: low-confidence items are flagged and start unchecked.",
@@ -546,7 +546,7 @@ const TOPIC = {
     { h: "We wired this by hand",
       sub: "Upload, ingest, retrieve, ground, review, export — each step assembled deliberately.",
       note: "<b>Next session:</b> agents and harnesses assemble pipelines like this <i>themselves</i> — choosing the tools, ordering the steps, and checking their own work.",
-      next: "Agents &amp; harnesses — what's next" },
+      next: "Agents & harnesses — what's next" },
   ],
 };
 /* ====================== CONTENT END ====================== */
