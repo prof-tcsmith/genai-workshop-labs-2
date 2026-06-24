@@ -2,9 +2,9 @@
 
 A demo proves an AI app works ONCE; validation measures that it's good enough —
 with evidence, against a bar set in advance. This lab runs a small golden-set
-eval over the policy corpus, shows the source each answer is checked against,
-demonstrates an LLM-as-judge, checks a must-refuse case, and rolls it all up
-into a severity-weighted go/no-go.
+eval over the policy corpus, shows the source (and its retrieval scores) each
+answer is checked against, demonstrates an LLM-as-judge, checks a must-refuse
+case, and rolls it up into a severity-weighted go/no-go.
 """
 import streamlit as st
 
@@ -16,6 +16,7 @@ client = boot("Evaluate & validate")
 
 SCORECARD_URL = "https://prof-tcsmith.github.io/genai-workshop-labs/deck.html"
 SEV = {"low": "🟢 low", "medium": "🟡 medium", "high": "🔴 high"}
+CONF_STRONG, CONF_WEAK = 0.45, 0.30  # cosine bands (illustrative — calibrate per embedding model)
 
 st.title("Evaluate & validate — is it ready to ship?")
 st.caption("Validation & release · Measure properties over a representative set, against thresholds set in advance — then decide on evidence.")
@@ -27,10 +28,15 @@ def esc(s: str) -> str:
     return (s or "").replace("$", r"\$")
 
 
+def conf_chip(s: float) -> str:
+    e = "🟢" if s >= CONF_STRONG else ("🟡" if s >= CONF_WEAK else "🔴")
+    return f"{e} {s:.2f}"
+
+
 # The golden set — a small, FIXED, versioned set of questions with known-correct
 # expectations. `kind`: 'fact' must be grounded (answer contains the known fact);
-# 'abstain' must refuse (the answer is NOT in the corpus). `sev` is how much a
-# WRONG answer here would hurt — a risk weight, NOT a quality/confidence score.
+# 'abstain' must refuse (the answer is NOT in the corpus). `sev` is HAND-ASSIGNED:
+# how much a WRONG answer here would hurt — a business-risk weight, not computed.
 GOLDEN = [
     {"q": "What is the enterprise refund window?", "kind": "fact", "accept": ["45"],
      "sev": "low", "why": "A wrong refund-window number is easy to notice and correct — low business cost."},
@@ -56,11 +62,12 @@ def _answer(index, q):
     ctx = "\n\n".join(f"[{d['doc']}] {d['text']}" for d, _ in hits)
     msgs = [{"role": "system", "content": SYS},
             {"role": "user", "content": f"Context:\n{ctx}\n\nQuestion: {q}"}]
-    return chat(client, msgs, max_tokens=160).choices[0].message.content or "", ctx
+    ans = chat(client, msgs, max_tokens=160).choices[0].message.content or ""
+    return ans, hits
 
 
 # ----------------------------------------------------------- what this is + how
-with st.expander("ℹ️ How this is scored — the golden set, grounding, and severity", expanded=True):
+with st.expander("ℹ️ How this is scored — golden set, grounding, and the two scores", expanded=True):
     st.markdown(
         """
 **Golden set** — a small, *fixed, versioned* set of questions with known-correct expectations. It's the
@@ -70,20 +77,22 @@ the policy corpus** plus **1 question whose answer is *not* in the corpus** (a m
 **How a fact is checked as _grounded_ — two independent ways:**
 1. **Key-fact assertion** (this section): the answer must contain the known-correct fact taken from the
    source document — a deterministic check against ground truth. Cheap, exact, re-runs on every change.
-   *Expand a row to see the exact source the answer is checked against.*
 2. **LLM-as-judge** (section 2): a separate model reads the retrieved source + the answer and rules
-   GROUNDED / NOT — it catches correct *paraphrases* the keyword check would miss, but must be calibrated
-   against human ratings before you trust it.
+   GROUNDED / NOT — it catches correct *paraphrases* the keyword check would miss, but must be calibrated.
 
-The **must-refuse** case passes only if the app **abstains** ("I don't have enough information") instead of
-inventing an answer.
+The **must-refuse** case passes only if the app **abstains** ("I don't have enough information").
 
-**Severity — 🟢 low / 🟡 medium / 🔴 high — is the _cost if this case is wrong_. It is NOT a confidence or
-quality score**, so a ✅ on a *low* item still **passed** — the label only says how much we'd care if it
-*failed*: 🟢 low = cosmetic / easily caught · 🟡 medium = customer-facing or financial-control error ·
-🔴 high = a safety / privacy / compliance breach. This is the **"errors aren't equal"** principle — weight
-failures by *impact, not count*. The go/no-go below is **severity-driven**: a single 🔴 high failure blocks
-release on its own, even with everything else green.
+**Each row carries TWO scores on different axes — don't conflate them:**
+- 🎯 **Severity (🟢 low / 🟡 medium / 🔴 high)** — *hand-assigned per question* as a business-risk judgment
+  (see each row's *why*): the **cost if this case is wrong**. It's a property of the *question*, fixed across
+  runs — **not** computed from the output and **not** a quality score (a ✅ on a *low* item still passed).
+- 📐 **Retrieval confidence (🟢 ≥ 0.45 · 🟡 0.30–0.45 · 🔴 < 0.30)** — *computed each run*: the cosine
+  similarity of the best retrieved chunk to the question. It measures **how much evidence the answer stands
+  on** (these thresholds are illustrative — calibrate per embedding model, like the judge).
+
+They **compose**: a *weak-confidence* answer to a *high-severity* question is the textbook case to **abstain
+or route to a human** — watch the must-refuse row do exactly that (its evidence is thin, so it refuses). The
+go/no-go is **severity-driven** (correctness × stakes); confidence is the **escalation lens** on top.
 """
     )
 
@@ -97,41 +106,53 @@ if st.button("Run eval", type="primary"):
         index = rag.build_index(client, corpus, size=600, overlap=100)
         rows = []
         for item in GOLDEN:
-            ans, ctx = _answer(index, item["q"])
-            low = ans.lower()
-            ok = any(a.lower() in low for a in item["accept"])
-            rows.append({**item, "ok": ok, "ans": ans, "ctx": ctx})
+            ans, hits = _answer(index, item["q"])
+            conf = hits[0][1] if hits else 0.0
+            ok = any(a.lower() in ans.lower() for a in item["accept"])
+            rows.append({**item, "ok": ok, "ans": ans, "hits": hits, "conf": conf})
 
     facts = [r for r in rows if r["kind"] == "fact"]
     fact_pass = sum(1 for r in facts if r["ok"])
     abstain_ok = all(r["ok"] for r in rows if r["kind"] == "abstain")
     failed = [r for r in rows if not r["ok"]]
     high_fail = any(r["sev"] == "high" for r in failed)
+    min_fact_conf = min((r["conf"] for r in facts), default=0.0)
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("Facts grounded", f"{fact_pass}/{len(facts)}", help="Each fact's answer contained the known-correct value from the source.")
     c2.metric("Must-refuse case", "✅ refused" if abstain_ok else "❌ fabricated", help="Did it abstain on the question with no answer in the corpus?")
-    c3.metric("High-severity checks", "✅ all clear" if not high_fail else "❌ FAILED", help="A single high-severity failure is an automatic No-go.")
+    c3.metric("High-severity", "✅ clear" if not high_fail else "❌ FAILED", help="A single high-severity failure is an automatic No-go.")
+    c4.metric("Weakest fact evidence", f"{min_fact_conf:.2f}", help="Lowest retrieval similarity (cosine) behind an answered fact. Low = answered on thin evidence → route to a human.")
 
-    st.caption("**✅ / ❌ = did the check pass.**  **Severity = the cost if it had failed** (risk weight, not a score).")
+    st.caption("Each row shows **✅/❌ (did the check pass)** · **🎯 severity (cost if wrong — authored)** · **📐 retrieval confidence (evidence strength — computed).**")
     for r in rows:
         if r["kind"] == "abstain":
             verdict = "✅ correctly refused" if r["ok"] else "❌ fabricated an answer it should have refused"
         else:
             verdict = "✅ grounded" if r["ok"] else "❌ not grounded"
-        st.markdown(f"{verdict} · _severity if wrong:_ {SEV[r['sev']]} — **{esc(r['q'])}**")
+        st.markdown(
+            f"{verdict} · 🎯 _severity if wrong:_ {SEV[r['sev']]} · 📐 _retrieval confidence:_ {conf_chip(r['conf'])} — **{esc(r['q'])}**"
+        )
         st.caption(f"↳ answer: {esc(r['ans'].strip()[:220])}")
-        with st.expander("🔎 why this severity · the source the answer is checked against"):
-            st.markdown(f"**Why {r['sev']} severity:** {r['why']}")
-            st.markdown("**Retrieved source** — what the answer must be grounded in:")
-            st.code((r["ctx"] or "(nothing retrieved)")[:900])
+        if r["conf"] < CONF_WEAK:
             if r["kind"] == "abstain":
-                st.caption("Notice the source contains **nothing** about this — so a truthful system must abstain, not invent an answer.")
+                st.caption("🔴 **Thin evidence — handled correctly by abstaining.** Weak retrieval should always end in abstain-or-escalate, never a confident guess.")
+            else:
+                st.caption("🔴 **Thin evidence behind a confident answer — route to a human.** A grounded-looking answer on weak retrieval is exactly the trap to catch.")
+        with st.expander("🔎 why this severity · the source + its retrieval scores"):
+            st.markdown(f"**Why {r['sev']} severity:** {r['why']}")
+            st.markdown("**Retrieved source** — cosine similarity to the question (higher = stronger evidence):")
+            for d, sc in r["hits"]:
+                st.markdown(f"- **{d['doc']}** · similarity **{sc:.2f}**")
+            st.code((r["hits"][0][0]["text"] if r["hits"] else "(nothing retrieved)")[:700])
+            if r["kind"] == "abstain":
+                st.caption("None of this answers the question — and the low similarity scores show why. Correct response: abstain.")
 
     st.session_state["_eval"] = {"fact_pass": fact_pass, "facts": len(facts),
                                  "abstain_ok": abstain_ok, "high_fail": high_fail,
                                  "n_failed": len(failed)}
-    a0, ctx0 = _answer(index, GOLDEN[0]["q"])  # stash a sample for the judge
+    a0, h0 = _answer(index, GOLDEN[0]["q"])  # stash a sample for the judge
+    ctx0 = "\n\n".join(f"[{d['doc']}] {d['text']}" for d, _ in h0)
     st.session_state["_judge_sample"] = (GOLDEN[0]["q"], a0, ctx0)
 
 # ---------------------------------------------------------------- 2) LLM-as-judge
@@ -173,7 +194,8 @@ else:
         st.success("🟢 **Go (for this slice)** — every fact was grounded and the must-refuse case abstained. Now confirm thresholds, beat your baseline, and record the decision.")
     st.caption(
         "**Rule:** any 🔴 high-severity failure → No-go · any other failure → Conditional · all pass → Go. "
-        "Severity weights failures by *impact, not count* — which is why one high-severity miss outranks four green facts."
+        "Severity weights failures by *impact, not count*. **Retrieval confidence is a separate escalation "
+        "signal** (see each row): weak evidence → abstain or send to a human, even when the check 'passes'."
     )
     st.markdown(
         "This is **one slice** of release readiness. Still required: **security / red-team** (Lab 4 — "
