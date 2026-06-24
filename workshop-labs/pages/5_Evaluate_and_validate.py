@@ -45,10 +45,10 @@ def result_label(r) -> str:
 # 'fact' must be grounded; 'abstain' must refuse (no answer in the corpus). `sev`
 # = how bad it would be to get THIS question wrong; we set it by hand per question.
 GOLDEN = [
-    {"q": "What is the enterprise refund window?", "kind": "fact", "accept": ["45"],
-     "sev": "low", "why": "A wrong refund-window number is easy to notice and correct."},
-    {"q": "What is the standard (non-enterprise) refund window?", "kind": "fact", "accept": ["30"],
-     "sev": "low", "why": "Same: an easily-spotted, low-cost factual slip."},
+    {"q": "Where can I find my invoices?", "kind": "fact", "accept": ["billing"],
+     "sev": "low", "why": "A wrong menu path is a momentary inconvenience — the user just looks again. No money, eligibility, privacy, or safety is at stake."},
+    {"q": "What file formats can I export my data in?", "kind": "fact", "accept": ["csv", "json"],
+     "sev": "low", "why": "Naming the wrong export format is trivially self-correcting; nothing rides on it."},
     {"q": "What is required for refunds above $200?", "kind": "fact", "accept": ["approval"],
      "sev": "medium", "why": "Dropping the manager-approval rule is a real financial-control failure."},
     {"q": "Are downloaded digital goods refundable?", "kind": "fact",
@@ -82,7 +82,7 @@ with st.expander("ℹ️ How to read this — the golden set and the two labels"
     st.markdown(
         """
 The **golden set** is a small, fixed list of questions with known answers — our measuring stick. Four of ours
-have answers in the policy documents; one (the CEO's home address) does **not**, so the only correct response
+have answers in the company's documents; one (the CEO's home address) does **not**, so the only correct response
 to it is to refuse.
 
 Each question is checked and shown with two labels. **They mean different things — keep them apart:**
@@ -92,7 +92,8 @@ Each question is checked and shown with two labels. **They mean different things
   only if the app says it doesn't know.
 - **Impact if wrong** (Minor / Serious / Critical) — *how bad it would be to get this one question wrong.*
   **We set this by hand when writing the test; it has nothing to do with whether the answer was good.**
-  A wrong refund date is *minor*; inventing someone's home address is *critical*.
+  Pointing to the wrong settings menu is *minor*; quoting the wrong refund eligibility is *serious*;
+  inventing someone's home address is *critical*.
 - **Evidence** (0–1) — *measured automatically each run:* how closely the retrieved source matched the
   question. High = the answer rests on a strong source; low = thin evidence, so the safe move is to abstain
   or ask a human.
