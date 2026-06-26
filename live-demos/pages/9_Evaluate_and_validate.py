@@ -225,4 +225,4 @@ else:
 
 st.divider()
 st.info("Lesson: you don't *prove* an AI app correct — you *measure* it's good enough and safe enough, against a bar set in advance, with evidence, and keep measuring after release.")
-st.success("🏁 **That's the last building block.** You've gone from a bare chatbot to a grounded, governed, **validated** system. **➡️ Now see the blocks become a real application — [Course Content Studio ↗](https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/).**")
+st.success("🏁 **That's the last building block.** You've gone from a bare chatbot to a grounded, governed, **validated** system. **➡️ Now see the blocks become a real application — two ways: [🎓 Course Content Studio ↗](https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/) (hand-built pipeline) or [🤖 Autonomous Course-Builder ↗](https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/course-builder) (agentic, over MCP — run locally via Docker).**")

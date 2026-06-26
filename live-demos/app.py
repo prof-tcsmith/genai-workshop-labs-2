@@ -53,10 +53,14 @@ for path, label, layers, desc in levels:
 st.divider()
 st.markdown(
     "### ▶ Then: see the blocks become a real application\n"
-    "These nine blocks are the **concepts**. **[Course Content Studio ↗](https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/)** "
-    "is the **applied case** — it *uses and extends* them with real services (a real vector "
-    "DB, a real database, a real MCP service) to turn your slides & readings into a "
-    "**Canvas QTI quiz** you can import into Canvas."
+    "These nine blocks are the **concepts**. Two applied cases build the *same* result — a "
+    "**Canvas-ready quiz from your course materials** — two different ways:\n\n"
+    "- 🎓 **[Course Content Studio ↗](https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/)** — "
+    "the **hand-built** pipeline: real services (a real vector DB, a real database, a real MCP tool) wired "
+    "together by you. *Runs in your browser.*\n"
+    "- 🤖 **[Autonomous Course-Builder ↗](https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/course-builder)** — "
+    "the **agentic** version: an orchestrator + specialist agents (Researcher / Item-writer / Critic / Exporter) "
+    "assemble it themselves over **MCP**, under governance (approval gate + audit). *Run locally via Docker.*"
 )
 
 with st.expander("The 7-layer stack (legend) / safety"):
