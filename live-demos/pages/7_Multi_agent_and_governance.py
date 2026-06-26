@@ -14,12 +14,17 @@ The agents are LLM calls with distinct roles:
   ORCHESTRATOR  coordinates and makes the policy decision.
   RESEARCH      READ-ONLY: get_order / search_policy to gather facts.
   ACTION        the ONLY agent allowed to perform issue_refund (a write).
+
+The three tools now live behind a real MCP server (``shared.mcp_tools``), reached
+over a genuine MCP client session — in-process by default, networked-capable via
+an ``mcp_server_url`` secret. Exposing a tool over MCP is a *capability*; WHO may
+call it is decided by the orchestrator's RBAC, not the server.
 """
 import json
 
 import streamlit as st
 
-from shared import store
+from shared import mcp_client
 from shared.core import boot, chat, layer_badge, stream_assistant, tool_calls_to_message
 from shared.slides import render_slides
 
@@ -28,20 +33,15 @@ client = boot("Level 7 · Multi-agent + governance")
 st.title("Level 7 · Multi-agent + governance")
 layer_badge([2, 7])
 st.caption(
-    "Multiple agents (Layer 2 orchestration) collaborate on a refund — but every "
-    "step runs under governance (Layer 7): role-based tool access, a human "
-    "approval gate, and an append-only audit log."
+    "Multiple agents (Layer 2 orchestration) collaborate on a refund — calling their tools over a "
+    "**real MCP server** — but every step runs under governance (Layer 7): role-based tool access, a "
+    "human approval gate, and an append-only audit log."
 )
 render_slides("governance")
 
-# --- Mock enterprise system (the "order DB") ---------------------------------
-ORDERS = {
-    "4471": {"placed_days_ago": 12, "status": "delivered", "amount": 240.0, "customer_type": "enterprise"},
-    "5012": {"placed_days_ago": 60, "status": "delivered", "amount": 90.0, "customer_type": "standard"},
-}
-
-# --- RBAC policy: which role may invoke which tool ----------------------------
-# This is the governance rule enforced in code (not just a prompt).
+# --- RBAC policy: which role may invoke which MCP tool ------------------------
+# The governance rule, enforced in code (not just a prompt). The MCP server
+# exposes every tool; THIS is what decides who may call each one.
 RBAC = {
     "research": {"get_order", "search_policy"},   # READ-ONLY
     "action": {"issue_refund"},                    # WRITE — action agent only
@@ -66,69 +66,61 @@ def a2a(sender: str, recipient: str, content: str) -> None:
     audit("a2a_message", msg)
 
 
-# --- Read tools (data layer the RESEARCH agent is allowed to call) ------------
-def get_order(order_id: str) -> dict:
-    o = ORDERS.get(str(order_id).strip())
-    return o if o else {"error": f"order {order_id} not found"}
+# --- The MCP tool catalog (advertised by shared.mcp_tools over the protocol) --
+@st.cache_data(show_spinner=False)
+def mcp_catalog() -> list[dict]:
+    """Ask the MCP server what tools it advertises (once)."""
+    return mcp_client.list_tools()
 
 
-def get_policy_index():
-    """Build + cache the refund_policy index once (uses store / embeddings)."""
-    if "refund_index" not in st.session_state:
-        docs = store.load_corpus(["refund_policy"])
-        if not docs:
-            st.error("No refund_policy.md found at shared/corpus/.")
-            st.stop()
-        with st.spinner("Indexing the refund policy (once)…"):
-            st.session_state["refund_index"] = store.build_index(client, docs)
-    return st.session_state["refund_index"]
+def _openai_schema(tool: dict) -> dict:
+    """Convert one MCP tool dict into an OpenAI function-tool schema."""
+    return {"type": "function", "function": {
+        "name": tool["name"],
+        "description": tool["description"],
+        "parameters": tool["input_schema"] or {"type": "object", "properties": {}},
+    }}
 
 
-def search_policy(query: str) -> dict:
-    hits = store.search(client, get_policy_index(), query, k=3)
-    return {"snippets": [{"doc": it["doc"], "text": it["text"], "score": round(s, 3)}
-                         for it, s in hits]}
+def tools_for_role(role: str) -> list[dict]:
+    """OpenAI tool schemas for ONLY the MCP tools this role's RBAC permits."""
+    allowed = RBAC.get(role, set())
+    return [_openai_schema(t) for t in mcp_catalog() if t["name"] in allowed]
 
 
-# --- RBAC-enforcing tool dispatch --------------------------------------------
-# Every tool call goes through here. If a role calls a tool it is not permitted
-# to use, the call is BLOCKED before any function runs, and the block is audited.
+# --- RBAC-enforcing dispatch — every permitted call goes over MCP -------------
+# If a role calls a tool it is not permitted to use, the call is BLOCKED before
+# it ever reaches the MCP server, and the block is audited.
 def call_tool(role: str, name: str, args: dict):
     if name not in RBAC.get(role, set()):
         audit("rbac_BLOCKED", {"role": role, "tool": name, "reason": "not permitted for role"})
         return {"error": f"RBAC: role '{role}' may not call '{name}'"}, True
     audit("rbac_allowed", {"role": role, "tool": name})
-    audit("tool_call", {"role": role, "tool": name, "args": args})
-    if name == "get_order":
-        result = get_order(args.get("order_id", ""))
-    elif name == "search_policy":
-        result = search_policy(args.get("query", ""))
-    elif name == "issue_refund":
-        result = issue_refund(args.get("order_id", ""), args.get("amount", 0.0))
-    else:
-        result = {"error": f"unknown tool {name}"}
-    audit("tool_result", {"tool": name, "result": result})
+    audit("mcp_call", {"role": role, "tool": name, "args": args})
+    try:
+        result = mcp_client.call_tool(name, args)
+    except Exception as exc:  # surface MCP/transport errors instead of crashing the page
+        result = {"error": f"MCP call failed: {type(exc).__name__}: {exc}"}
+    audit("mcp_result", {"tool": name, "result": result})
     return result, False
 
 
-# --- Write tool (ACTION agent only; reached only after human approval) --------
-def issue_refund(order_id: str, amount: float) -> dict:
-    # Mock side effect — in real life this hits the payments system.
-    return {"refunded": True, "order_id": str(order_id), "amount": float(amount),
-            "confirmation": f"RF-{order_id}"}
-
-
-# Tool schemas exposed to the RESEARCH agent (read-only set).
-RESEARCH_TOOLS = [
-    {"type": "function", "function": {
-        "name": "get_order", "description": "Look up an order by id.",
-        "parameters": {"type": "object", "properties": {
-            "order_id": {"type": "string"}}, "required": ["order_id"]}}},
-    {"type": "function", "function": {
-        "name": "search_policy", "description": "Search the refund policy for relevant text.",
-        "parameters": {"type": "object", "properties": {
-            "query": {"type": "string"}}, "required": ["query"]}}},
-]
+# --- MCP panel: the tools now live behind a real MCP server -------------------
+with st.expander(f"🔌 Tools run behind a real MCP server · mode: {mcp_client.mode()}", expanded=True):
+    st.caption(
+        "The agents don't call Python functions — they call **named tools over the MCP protocol** "
+        "(a genuine client→server→tool round-trip). In-process by default; set an `mcp_server_url` "
+        "secret to point at a networked server, with no app-code change."
+    )
+    _cat = mcp_catalog()
+    for _col, _t in zip(st.columns(len(_cat) or 1), _cat):
+        _params = ", ".join((_t["input_schema"] or {}).get("properties", {}).keys())
+        _col.markdown(f"**`{_t['name']}`**  \n`({_params})`  \n{_t['description'][:90]}")
+    st.info(
+        "**Capability ≠ authorization.** The server *exposes* all three tools to anyone who can reach "
+        "it. WHO may call each is enforced by the orchestrator's **RBAC** (below), not by the server — "
+        "that separation is the governance point."
+    )
 
 
 def run_research(order_id: str, placeholder=None) -> str:
@@ -142,7 +134,7 @@ def run_research(order_id: str, placeholder=None) -> str:
         {"role": "user", "content": f"Gather the facts needed to handle a refund for order {order_id}."},
     ]
     for _ in range(5):  # cap the tool loop
-        content, calls = stream_assistant(client, messages, tools=RESEARCH_TOOLS, placeholder=None)
+        content, calls = stream_assistant(client, messages, tools=tools_for_role("research"), placeholder=None)
         if not calls:
             break
         messages.append(tool_calls_to_message(content, calls))
@@ -280,9 +272,10 @@ else:
 
 st.divider()
 st.info(
-    "**Takeaway:** orchestration lets specialised agents collaborate (Layer 2), but "
-    "trust comes from governance (Layer 7): least-privilege RBAC on tools, a human "
-    "in the loop before any irreversible action, and a complete audit trail."
+    "**Takeaway:** specialised agents collaborate (Layer 2) and reach their tools over a standard "
+    "**MCP** server (decoupled, swappable for a networked one) — but trust comes from governance "
+    "(Layer 7): least-privilege RBAC on every tool call, a human in the loop before any irreversible "
+    "action, and a complete audit trail."
 )
 st.warning(
     "**What's missing — it hasn't been adversarially tested.** Governance rules only "
