@@ -18,6 +18,7 @@ client = boot("Level 3 · Guardrails")
 
 st.title("Level 3 · Guardrails")
 layer_badge([1, 3, 7])
+st.caption("🧭 **Dimension 3 of 11 — guardrails:** an independent check before the answer ships.")
 st.caption(
     "Add **guardrails** (Layer 7 governance) on top of memory: scope the bot to "
     "Northwind Cloud support and screen every message with an **independent check** "

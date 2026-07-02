@@ -11,6 +11,7 @@ client = boot("Red-team & govern an agent")
 
 st.title("Level 8 · Red-team & govern")
 layer_badge([7])
+st.caption("🧭 **Dimension 11 of 11, under attack — governance:** controls only count if they hold up against an adversary.")
 st.caption("Layer 7 · Attack an HR-policy agent, then switch on controls and watch the attacks fail.")
 render_slides("red-team")
 

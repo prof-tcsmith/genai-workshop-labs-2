@@ -7,6 +7,7 @@ client = boot("Level 1 · Chatbot")
 
 st.title("Level 1 · Chatbot")
 layer_badge([1, 3])
+st.caption("🧭 **Dimension 1 of 11 — context engineering:** behavior lives in the context, not the weights.")
 st.caption("A system prompt + one message. **No memory. No guardrails.** This is all a bare chatbot is.")
 render_slides("chatbot")
 

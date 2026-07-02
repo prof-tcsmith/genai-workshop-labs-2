@@ -32,6 +32,7 @@ client = boot("Level 7 · Multi-agent + governance")
 
 st.title("Level 7 · Multi-agent + governance")
 layer_badge([2, 7])
+st.caption("🧭 **Dimensions 8, 10 & 11 of 11 — MCP-style integrations, logging, governance:** decoupled tools, an audit trail, least privilege.")
 st.caption(
     "Multiple agents (Layer 2 orchestration) collaborate on a refund — calling their tools over a "
     "**real MCP server** — but every step runs under governance (Layer 7): role-based tool access, a "
@@ -109,8 +110,12 @@ def call_tool(role: str, name: str, args: dict):
 with st.expander(f"🔌 Tools run behind a real MCP server · mode: {mcp_client.mode()}", expanded=True):
     st.caption(
         "The agents don't call Python functions — they call **named tools over the MCP protocol** "
-        "(a genuine client→server→tool round-trip). In-process by default; set an `mcp_server_url` "
-        "secret to point at a networked server, with no app-code change."
+        "(a genuine client→server→tool round-trip). **Why this matters — decoupling:** calling a "
+        "backend's API directly (say, the Postgres API) would *weld* the system to that backend — "
+        "tight coupling, brittle architecture. MCP interposes an interface that is **purpose-constrained** "
+        "(only the verbs the job needs) and **generalized** (any backend can serve them): swap the "
+        "backend, the agents don't change. In-process by default; set an `mcp_server_url` secret to "
+        "point at a networked server, with no app-code change."
     )
     _cat = mcp_catalog()
     for _col, _t in zip(st.columns(len(_cat) or 1), _cat):

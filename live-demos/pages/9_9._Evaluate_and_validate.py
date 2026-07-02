@@ -22,6 +22,7 @@ CONTRAST_Q = "What is Northwind Cloud's enterprise refund window, in days?"  # f
 
 st.title("Level 9 · Evaluate & validate — is it ready to ship?")
 layer_badge([7])
+st.caption("🧭 **Beyond the 11 — validation:** you don't prove it correct; you measure it's good enough to ship.")
 st.caption("Layer 7 · Measure properties over a representative set, against thresholds set in advance — then decide on evidence.")
 render_slides("validate")
 

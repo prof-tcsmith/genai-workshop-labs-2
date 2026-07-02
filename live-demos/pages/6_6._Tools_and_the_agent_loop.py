@@ -29,6 +29,7 @@ client = boot("Level 6 · Tools & the agent loop")
 
 st.title("Level 6 · Tools & the agent loop")
 layer_badge([2, 3, 5])
+st.caption("🧭 **Dimensions 7 & 9 of 11 — tool use + approvals:** the model acts — plan → call → observe, on a leash.")
 st.caption(
     "The model can now **act**. It runs an **agent loop** — plan → call a tool → "
     "observe → repeat — over an MCP-style tool server, with a **human approval "

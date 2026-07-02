@@ -17,6 +17,7 @@ client = boot("Level 2 · Memory")
 
 st.title("Level 2 · Memory")
 layer_badge([1, 3])
+st.caption("🧭 **Dimension 2 of 11 — memory:** state = the history replayed each turn (and it isn't free).")
 st.caption(
     "Add **memory**: the bot now **remembers the conversation**. We keep the history "
     "in session and replay all of it (plus the system prompt) every turn — so "

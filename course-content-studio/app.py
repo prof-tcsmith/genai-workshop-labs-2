@@ -26,7 +26,7 @@ st.markdown(
 )
 
 st.caption(
-    "◀ New here? Start with **[Enterprise AI — the building blocks ↗](https://genai-workshop-labs-58vsud6bvuaus8e4wymwfu.streamlit.app/)** "
+    "◀ New here? Start with **[Enterprise AI — the building blocks ↗](https://muma-genai.streamlit.app/)** "
     "(chatbot → memory → guardrails → grounding & RAG → build & break a RAG → tools & the agent loop → "
     "multi-agent & governance → red-team) — the concepts this capstone is built on and extends."
 )

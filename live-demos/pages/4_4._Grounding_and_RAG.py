@@ -15,6 +15,7 @@ client = boot("Level 4 · Grounding & RAG")
 
 st.title("Level 4 · Grounding & RAG")
 layer_badge([3, 4, 6])
+st.caption("🧭 **Dimension 4 of 11 — retrieval-augmented generation:** retrieve → cite → abstain.")
 st.caption(
     "Retrieve the right snippets (Layer 4) from a small information store (Layer 6), "
     "then **ground** the model on them (Layer 3). Compare the model answering alone "

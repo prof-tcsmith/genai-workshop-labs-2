@@ -42,7 +42,7 @@ The participant-code gate turns on **only** when `workshop_passphrase_sha256` is
 stay gate-free. **Pre-warm** each app right before the session (free apps sleep when idle).
 
 Current deployments:
-- 🧱 Building blocks: https://genai-workshop-labs-58vsud6bvuaus8e4wymwfu.streamlit.app/
+- 🧱 Building blocks: https://muma-genai.streamlit.app/
 - 🎓 Course Content Studio: https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/
 
 ## Run locally (Docker)

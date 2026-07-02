@@ -8,6 +8,7 @@ client = boot("Build & break a RAG")
 
 st.title("Level 5 · Build & break a RAG")
 layer_badge([4, 6])
+st.caption("🧭 **Dimension 5 of 11 — data access:** retrieval quality is data quality.")
 st.caption("Layers 4 & 6 · Build a tiny retrieval pipeline, then sabotage it and watch quality collapse.")
 render_slides("build-break-rag")
 
