@@ -16,6 +16,23 @@ st.write(
 )
 render_slides("overview", label="📊 Start here — the 7-layer stack (interactive)", expanded=True)
 
+with st.expander("⏱️ Here from the **GenAI Day** session? The 60-minute tour, in order"):
+    st.markdown(
+        "The session walks the *dimensions of GenAI* through these demos — follow along live, or replay "
+        "any step later at your own pace:\n\n"
+        "1. **Level 1 · Chatbot** — context engineering (a system prompt shapes behavior)\n"
+        "2. **Level 2 · Memory** — the history is replayed every turn (and grows)\n"
+        "3. **Level 3 · Guardrails** — an independent pre-flight check\n"
+        "4. **Level 4 · Grounding & RAG** — retrieve → cite → abstain\n"
+        "5. **Level 5 · Build & break a RAG** — most failures are *data* failures\n"
+        "6. **Structured outputs** — [the browser prompt lab ↗](https://prof-tcsmith.github.io/genai-workshop-labs/prompt-lab/)\n"
+        "7. **Level 6 · Tools & the agent loop** — tool use + a human approval gate\n"
+        "8. **Level 7 · Multi-agent + governance** — agents calling tools over **MCP**, RBAC, audit log\n"
+        "9. **Level 8 · Red-team** — attack it, then switch the controls on\n\n"
+        "Slides for the session: [Dimensions of GenAI (60-min deck) ↗](https://prof-tcsmith.github.io/genai-workshop-labs/day.html) · "
+        "everything else: [the hub ↗](https://prof-tcsmith.github.io/genai-workshop-labs/)"
+    )
+
 if st.session_state.get("key"):
     st.success("Key connected. Open a level from the sidebar or the list below.")
 else:
