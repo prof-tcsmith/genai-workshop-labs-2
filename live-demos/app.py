@@ -75,6 +75,11 @@ render_slides("overview", label="📊 Recap — the 7-layer stack (from the intr
 
 with st.expander("The 7-layer stack (legend) / safety / session slides"):
     st.markdown("\n".join(f"- **{k}** — {v}" for k, v in STACK.items()))
+    st.caption(
+        "Note: layer 1 (*Experience*) is the **interface** — and it isn't necessarily human. Another "
+        "system can call your app via API, or the app can expose itself **as an agent over A2A** that "
+        "other agents call (Level 7 shows agents as callers). Same layer, same trust requirements."
+    )
     st.markdown(
         "Session slides: [Dimensions of GenAI (60-min deck) ↗](https://prof-tcsmith.github.io/genai-workshop-labs/day.html) · "
         "everything else: [the hub ↗](https://prof-tcsmith.github.io/genai-workshop-labs/)"

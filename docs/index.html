@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Enterprise AI for IS Faculty — workshop hub</title>
+<title>Dimensions of GenAI — the journey</title>
 <style>
   :root{--bg:#0b1020;--panel:#141d36;--panel2:#1b2748;--ink:#eaf0ff;--muted:#9fb0d6;--faint:#6b7aa3;
         --line:rgba(255,255,255,.14);--accent:#6ea8fe;--accent2:#5eead4;--violet:#a78bfa;--warn:#fbbf24;}
@@ -15,7 +15,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:34px 20px 64px}
   .kicker{color:var(--accent2);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
   h1{font-size:clamp(28px,4.4vw,46px);margin:6px 0 8px;letter-spacing:-.01em}
-  .sub{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 0 22px;max-width:70ch}
+  .sub{color:var(--muted);font-size:clamp(15px,2vw,19px);margin:0 0 22px;max-width:74ch}
   a{color:var(--accent)}
   code{background:#070c1a;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13px}
 
@@ -26,26 +26,21 @@
     font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
   .sectlabel::after{content:"";flex:1;height:1px;background:var(--line)}
 
-  /* primary path: two big numbered tracks with a connector */
-  .path{display:grid;grid-template-columns:1fr 44px 1fr;gap:0;align-items:stretch}
+  /* primary: the journey card + the slides card */
+  .path{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:stretch}
   @media(max-width:760px){.path{grid-template-columns:1fr}}
   .track{display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg,var(--panel),var(--panel2));
     border:1px solid var(--line);border-radius:15px;padding:20px 22px;transition:border-color .15s,transform .1s}
   .track:hover{border-color:var(--accent);transform:translateY(-2px)}
   .track.cap{border-color:rgba(94,234,212,.45)}
-  .track .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
-    background:rgba(110,168,254,.16);color:var(--accent);font-weight:800;font-size:14px;margin-bottom:8px}
-  .track.cap .num{background:rgba(94,234,212,.16);color:var(--accent2)}
   .track .tag{color:var(--accent2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
   .track h2{margin:3px 0 6px;font-size:22px}
   .track p{margin:0 0 10px;color:var(--muted);font-size:14.5px}
-  .track .flow{color:var(--faint);font-size:12.5px;margin:0 0 12px;line-height:1.7}
+  .track .flow{color:var(--faint);font-size:12.5px;margin:0 0 12px;line-height:1.8}
   .track .go{color:var(--accent);font-weight:700;font-size:14px}
   .track.cap .go{color:var(--accent2)}
-  .conn{display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:26px}
-  @media(max-width:760px){.conn{transform:rotate(90deg);padding:6px 0}}
+  .stopnum{display:inline-block;min-width:1.5em;color:var(--accent);font-weight:800}
 
-  /* secondary toolbox grid */
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
   @media(max-width:760px){.grid{grid-template-columns:1fr}}
   .card{display:block;text-decoration:none;color:inherit;background:linear-gradient(180deg,var(--panel),var(--panel2));
@@ -56,7 +51,6 @@
   .card p{margin:0;color:var(--muted);font-size:13.5px}
   .card .go{margin-top:9px;color:var(--accent);font-weight:600;font-size:13.5px}
 
-  /* the 7-layer strip */
   .layers{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 6px}
   .pill{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px;color:var(--muted)}
   .pill b{color:var(--ink)}
@@ -68,45 +62,50 @@
 <body>
 <div class="wrap">
 
-  <span class="kicker">USF Muma College of Business · Information Systems</span>
-  <h1>Enterprise AI for IS Faculty</h1>
-  <p class="sub">A hands-on workshop. You build a GenAI system <b>one layer at a time</b> — then watch those same
-  blocks become a <b>real application</b> that turns your course materials into <b>Canvas-ready quizzes</b>.
-  Everything runs in your browser: no install, no account.</p>
+  <span class="kicker">USF Muma College of Business · Tim Smith</span>
+  <h1>Dimensions of <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent">GenAI</span> — the journey</h1>
+  <p class="sub">Eleven dimensions of a real GenAI system, walked as <b>ten hands-on stops</b> — the same journey
+  from the session, here to replay at your own pace. A GenAI <i>application</i> is a system; the model is just
+  one of its parts.</p>
 
   <div class="note">
-    <b>Start here:</b> when an app asks for a <b>participant code</b> (and, in a couple of labs, an <b>OpenAI key</b>),
-    Tim hands it out at the session. Keys stay server-side or in your browser only — nothing is stored.
-    Free apps sleep when idle, so give one a few seconds to wake on first click.
+    <b>Picking up where the session left off:</b> the demos app asks for the <b>participant code</b> given in
+    the room. Keys stay server-side or in your browser only — nothing is stored. Free apps sleep when idle, so
+    give one a few seconds to wake on first click.
   </div>
 
-  <!-- ============ PRIMARY PATH ============ -->
-  <div class="sectlabel">The workshop, in two moves</div>
+  <!-- ============ THE JOURNEY ============ -->
+  <div class="sectlabel">Start here — the journey &amp; the slides</div>
   <div class="path">
 
-    <a class="track" id="building-blocks" href="https://muma-genai.streamlit.app/">
-      <span class="num">1</span>
-      <div class="tag">Learn the building blocks</div>
-      <h2>Enterprise AI — the building blocks</h2>
-      <p>Nine short, interactive steps. Each adds <b>one</b> capability, lights up more of the 7-layer
-      stack, and names <b>what's still missing</b> — which sets up the next one.</p>
-      <p class="flow">Chatbot → Memory → Guardrails → Grounding &amp; RAG → Build &amp; break a RAG →
-      Tools &amp; the agent loop → Multi-agent &amp; governance → Red-team &amp; govern →
-      Evaluate &amp; validate</p>
-      <div class="go">Open the building blocks →</div>
+    <a class="track" href="https://muma-genai.streamlit.app/">
+      <div class="tag">The demos — 10 stops, 11 dimensions</div>
+      <h2>🧱 The journey (hands-on app)</h2>
+      <p>Every stop demonstrates one or more dimensions live, adds <b>one</b> capability, and names what's
+      still missing. The sidebar is numbered — walk it in order.</p>
+      <p class="flow">
+        <span class="stopnum">1</span> Chatbot · <i>context engineering</i><br>
+        <span class="stopnum">2</span> Memory · <i>memory</i><br>
+        <span class="stopnum">3</span> Guardrails · <i>guardrails</i><br>
+        <span class="stopnum">4</span> Grounding &amp; RAG · <i>retrieval-augmented generation</i><br>
+        <span class="stopnum">5</span> Build &amp; break a RAG · <i>data access</i><br>
+        <span class="stopnum">🌐</span> Prompt lab (browser) · <i>structured outputs</i><br>
+        <span class="stopnum">6</span> Tools &amp; the agent loop · <i>tool use + approvals</i><br>
+        <span class="stopnum">7</span> Multi-agent &amp; governance · <i>MCP + logging + governance</i><br>
+        <span class="stopnum">8</span> Red-team &amp; govern · <i>governance, under attack</i><br>
+        <span class="stopnum">9</span> Evaluate &amp; validate · <i>beyond the 11: is it ready to ship?</i>
+      </p>
+      <div class="go">Open the journey →</div>
     </a>
 
-    <div class="conn">→</div>
-
-    <a class="track cap" id="studio" href="https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/">
-      <span class="num">2</span>
-      <div class="tag">See them become a real app</div>
-      <h2>Course Content Studio</h2>
-      <p>The applied case: the <b>same blocks</b>, now with <b>real services</b> — a real vector DB, a real
-      database, a real MCP service — assembled into a working tool.</p>
-      <p class="flow">Upload PDFs / PPTX / HTML / Markdown → ground an LLM in your material →
-      generate quizzes &amp; assignments → <b>export a Canvas QTI .zip</b> to import into Canvas</p>
-      <div class="go">Open the capstone →</div>
+    <a class="track cap" href="./day.html">
+      <div class="tag">The session slides</div>
+      <h2>📽️ Dimensions of GenAI (60-min deck)</h2>
+      <p>The six slides that frame the journey: the goals, <b>tool → feature → system</b>, the
+      <b>7-layer stack</b>, and the numbered <b>11-dimension itinerary</b>.</p>
+      <p class="flow">Use them as your map while you replay the stops — every itinerary card points at
+      its demo.</p>
+      <div class="go">Open the slides →</div>
     </a>
 
   </div>
@@ -122,60 +121,60 @@
     <span class="pill"><b>6</b> · Data foundation</span>
     <span class="pill gov"><b>7</b> · Governance (every layer)</span>
   </div>
-  <p class="sub" style="margin:6px 0 0;font-size:15px">Every block and the capstone map back to this one picture —
-  the model (layer 3) is the smallest part; the leverage is in retrieval, data, and governance.
-  <a href="./deck.html">Open the interactive deck →</a></p>
+  <p class="sub" style="margin:6px 0 0;font-size:15px">Every dimension sits on a layer of this one map — the model
+  (layer 3) is the smallest part; the leverage is in retrieval, data, and governance. Note: layer 1 is the
+  <b>interface</b>, and it isn't necessarily human — another system calling your API, or your app exposed
+  <b>as an agent over A2A</b>, lives there too.</p>
 
-  <!-- ============ TOOLBOX ============ -->
-  <div class="sectlabel">Toolbox &amp; reference</div>
+  <!-- ============ GO DEEPER ============ -->
+  <div class="sectlabel">Go deeper — the blocks become real applications</div>
   <div class="grid">
-    <a class="card" href="./deck.html">
-      <div class="layer">Slides</div>
-      <h3>The deck</h3>
-      <p>The interactive talk: the 7-layer stack, the diagrams, and the closing cases.</p>
-      <div class="go">Open the deck →</div>
+    <a class="card" href="https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/">
+      <div class="layer">Applied case · hand-built</div>
+      <h3>🎓 Course Content Studio</h3>
+      <p>The same blocks wired <b>by hand</b> into a real tool: your slides &amp; readings → a
+      <b>Canvas-ready quiz</b> (real vector DB, real database, real MCP service).</p>
+      <div class="go">Open the capstone →</div>
     </a>
-    <a class="card" href="./day.html">
-      <div class="layer">Slides · 60-min session</div>
-      <h3>Dimensions of GenAI (GenAI Day)</h3>
-      <p>The short deck from the 60-minute session — eleven dimensions, one map, all demo-driven.</p>
-      <div class="go">Open the GenAI Day deck →</div>
+    <a class="card" href="https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/course-builder">
+      <div class="layer">Applied case · agentic</div>
+      <h3>🤖 Autonomous Course-Builder</h3>
+      <p>The same result built <b>by agents</b>: an orchestrator + specialists over <b>MCP</b>, under
+      governance. Run locally via Docker — only an OpenAI key needed.</p>
+      <div class="go">Setup &amp; run →</div>
+    </a>
+    <a class="card" href="./deck.html">
+      <div class="layer">The full story · 42 slides</div>
+      <h3>📚 The complete deck</h3>
+      <p>The deep-dive the 60-minute session is drawn from — every layer, validation &amp; release, the
+      <b>Release Readiness Scorecard</b>, value &amp; adoption, and three worked cases.</p>
+      <div class="go">Open the full deck →</div>
     </a>
     <a class="card" href="./prompt-lab/">
-      <div class="layer">Layer 3 · browser-only</div>
-      <h3>Prompt &amp; structured output</h3>
-      <p>Iterate prompts, change format and temperature, and extract clean JSON. Runs right here.</p>
+      <div class="layer">Stop 🌐 · browser-only</div>
+      <h3>Prompt &amp; structured output lab</h3>
+      <p>The structured-outputs stop from the journey — iterate prompts and extract clean JSON, right here.</p>
       <div class="go">Open the prompt lab →</div>
     </a>
-    <a class="card" href="https://github.com/modelcontextprotocol/inspector">
-      <div class="layer">Layer 2 · advanced (Docker)</div>
-      <h3>MCP tool server</h3>
-      <p>Run a small MCP server in a container and connect a client. See <code>mcp-lab/README.md</code>.</p>
-      <div class="go">Setup instructions →</div>
-    </a>
     <a class="card" href="https://github.com/prof-tcsmith/genai-workshop-labs">
-      <div class="layer">Source</div>
+      <div class="layer">Source · run it all locally</div>
       <h3>GitHub repo</h3>
-      <p>All three apps, the decks, and the facilitator notes — clone, run locally, or reuse in class.</p>
+      <p>Every app and deck. Clone it, <code>docker compose up</code>, and the whole journey runs on your
+      machine — reuse any piece in your own courses.</p>
       <div class="go">View the repo →</div>
     </a>
-    <a class="card" href="https://muma-genai.streamlit.app/">
-      <div class="layer">Run locally · Docker</div>
-      <h3>Building blocks image</h3>
-      <p>The blocks app also ships as a container: <code>proftsmith/genai-live-demos</code>.</p>
-      <div class="go">Open the app →</div>
-    </a>
-    <a class="card" href="https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/">
-      <div class="layer">Next session</div>
-      <h3>Autonomy &amp; agents</h3>
-      <p>The capstone is built by hand. Next time: agents and harnesses that assemble the pipeline themselves.</p>
-      <div class="go">Preview in the capstone →</div>
+    <a class="card" href="https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/mcp-lab">
+      <div class="layer">Advanced · protocol depth</div>
+      <h3>MCP tool server (mcp-lab)</h3>
+      <p>Stops 6–7 showed tools over MCP; this runs a standalone MCP server in Docker for protocol-level
+      exploration.</p>
+      <div class="go">Setup instructions →</div>
     </a>
   </div>
 
   <p class="foot">
-    Facilitator: pre-warm both Streamlit apps before the session (free apps sleep when idle), hand out the
-    participant code, and rotate the keys afterward.
+    Facilitator notes: pre-warm the two Streamlit apps before a session (free apps sleep), hand out the
+    participant code in the room, and rotate the shared keys afterward.
   </p>
 
 </div>
