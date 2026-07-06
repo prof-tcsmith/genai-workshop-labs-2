@@ -1,0 +1,5 @@
+# Hide Streamlit's automatic page list — the sidebar shows ONLY today's
+# five-stop route (rendered by shared.core.render_route_sidebar). Levels not
+# on the route stay deployed but unlisted.
+[client]
+showSidebarNavigation = false
