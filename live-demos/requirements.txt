@@ -1,3 +1,6 @@
+# Touching this file forces Streamlit Cloud to rebuild the environment (a full
+# process restart) — needed when shared/ modules change, because hot-reload
+# re-runs app.py against the OLD shared.core still cached in sys.modules.
 streamlit>=1.36
 openai>=1.40
 anthropic>=0.40
