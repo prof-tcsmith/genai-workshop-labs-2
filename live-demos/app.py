@@ -82,7 +82,7 @@ with st.expander("The 7-layer stack (legend) / safety / session slides"):
         "other agents call (Lab 5 shows agents as callers). Same layer, same trust requirements."
     )
     st.markdown(
-        "Session slides: [Dimensions of GenAI (60-min deck) ↗](https://prof-tcsmith.github.io/genai-workshop-labs/day.html) · "
+        "Session slides: [GenAI Day slides (60-min deck) ↗](https://prof-tcsmith.github.io/genai-workshop-labs/day.html) · "
         "everything else: [the hub ↗](https://prof-tcsmith.github.io/genai-workshop-labs/)"
     )
     st.markdown(
