@@ -1,0 +1,32 @@
+# Prior-Authorization Triage — the applied Case — (c) Dr. Tim Smith, 2026
+#
+# Two services: a networked MCP tool server and the agentic app that drives it.
+# Runs entirely locally — the ONLY external dependency is an OpenAI key.
+# SYNTHETIC teaching data only. Not real patients. Not medical advice.
+#
+#   export OPENAI_API_KEY=sk-...        (or put it in a .env file beside this one)
+#   docker compose up --build
+#   open http://localhost:8501
+#
+name: prior-auth-agent
+services:
+  mcp-server:
+    build: ./mcp-server
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    expose:
+      - "8000"           # reachable by the app on the internal network (no host port)
+    restart: unless-stopped
+
+  app:
+    build: ./app
+    ports:
+      # Host port is overridable (set APP_PORT) so it won't clash with another
+      # Streamlit app already on 8501. Defaults to 8501.
+      - "${APP_PORT:-8501}:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MCP_SERVER_URL=http://mcp-server:8000/mcp
+    depends_on:
+      - mcp-server
+    restart: unless-stopped

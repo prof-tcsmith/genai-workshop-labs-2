@@ -62,17 +62,14 @@ for stop, dims, desc, links in ROUTE:
 
 st.divider()
 st.markdown(
-    "### 🎓 Homework — two applied cases (a category of their own)\n"
-    "The five labs are the **concepts**. These two applications assemble those same concepts into a real "
-    "tool — a **Canvas-ready quiz from your course materials** — two different ways. We'll discuss in the "
-    "session *how* each one demonstrates what you just did; **exploring them is your homework**:\n\n"
-    "- 🎓 **[Course Content Studio ↗](https://genai-workshop-labs-awybgq8gnmnrevxna2ukv3.streamlit.app/)** — "
-    "the **hand-built** pipeline (Labs 1–3 writ large): real services — a real vector DB, a real database, a "
-    "real MCP tool — wired together by you, with a required human review before anything exports. *Runs in your browser.*\n"
-    "- 🤖 **[Autonomous Course-Builder ↗](https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/course-builder)** — "
-    "the **agentic** version (Labs 4–5 writ large): an orchestrator + specialist agents (Researcher / Item-writer / "
-    "Critic / Exporter) assemble the same result themselves over **MCP**, under governance (approval gate + audit). "
-    "*Run locally via Docker.*"
+    "### 🎓 The Case — one agentic system that assembles all five labs\n"
+    "The five labs are the **concepts**. The **Case** puts them together into a real agentic workflow — "
+    "**Prior-Authorization Triage**: an orchestrator + specialist agents decide a *synthetic* coverage request "
+    "against policy, **grounded in retrieval**, **judged by an LLM critic**, and **governed by a human approval "
+    "gate + an audit log**. We demo it live; **running it yourself is your homework**.\n\n"
+    "- 🏥 **[Prior-Authorization Triage ↗](https://github.com/prof-tcsmith/genai-workshop-labs/tree/main/prior-auth-agent)** — "
+    "specialist agents over **A2A + a real MCP server**, RAG-grounded, with a human approval gate + audit. Runs locally "
+    "via **Docker** (only an OpenAI key). *Synthetic data — a demonstration of AI system architecture, not medical advice.*"
 )
 
 render_slides("overview", label="📊 Recap — the 7-layer stack (from the intro slides)", expanded=False)
