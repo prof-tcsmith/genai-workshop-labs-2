@@ -29,8 +29,16 @@ def _passages(passages: list[dict]) -> str:
     return "\n\n".join(f"[{p['doc']}] {p['text']}" for p in passages)
 
 
-def _review(request: dict, member: dict, passages: list[dict]) -> dict | None:
-    system = (
+_SLOPPY_SYSTEM = (
+    "You are a rushed prior-authorization reviewer with a huge queue. Skim the note; "
+    "if things look mostly fine, approve. Assess AT MOST TWO criteria and assume "
+    "anything the note doesn't mention is fine. Cite the policy (citation.source = "
+    "the [doc] label). Respond using the provided JSON schema only."
+)
+
+
+def _review(request: dict, member: dict, passages: list[dict], sloppy: bool = False) -> dict | None:
+    system = _SLOPPY_SYSTEM if sloppy else (
         "You are a prior-authorization nurse reviewer. Decide the request using ONLY "
         "the provided coverage-policy passages — never invent criteria, thresholds, or "
         "facts absent from them. Assess EACH relevant criterion (met = yes/no/unknown) "
@@ -56,12 +64,16 @@ def _review(request: dict, member: dict, passages: list[dict]) -> dict | None:
 def _critique(request: dict, det: dict, passages: list[dict]) -> dict:
     system = (
         "You are a strict medical-director reviewer AUDITING a draft determination. "
-        "Decide if it is (a) GROUNDED — every criterion assessment and the decision are "
-        "supported by the policy passages, with nothing invented — and (b) CONSISTENT — "
-        "the decision follows from the criteria (all met → approve; a required one not "
-        "met → deny; a required one unknown → pend). Reply with JSON {grounded, "
-        "consistent, ok, notes}; ok = grounded AND consistent; notes give one concrete "
-        "reason."
+        "Work step by step: (1) enumerate EVERY numbered requirement in the policy "
+        "passages (including 'no recent equivalent imaging' style requirements); "
+        "(2) check the draft explicitly assessed each one with evidence quoted from "
+        "the clinical note; (3) check the decision follows the rule: all required "
+        "met → approve; a required one clearly not met → deny; a required one not "
+        "determinable from the note → pend. GROUNDED = every assessment is supported "
+        "by the passages and the note, nothing invented, no requirement skipped or "
+        "assumed met without documentation. CONSISTENT = the decision follows the "
+        "rule in (3). Reply with JSON {grounded, consistent, ok, notes}; ok = "
+        "grounded AND consistent; notes name the specific requirement at fault."
     )
     user = (f"POLICY PASSAGES:\n{_passages(passages)}\n\n"
             f"CLINICAL NOTE: {request['clinical_note']}\n\n"
@@ -75,8 +87,11 @@ def _critique(request: dict, det: dict, passages: list[dict]) -> dict:
 def _revise(request: dict, det: dict, verdict: dict, passages: list[dict]) -> dict | None:
     system = (
         "Revise the prior-authorization determination so it is fully grounded in the "
-        "policy passages and its decision is consistent with the criteria. Fix exactly "
-        "what the auditor flagged. Respond using the provided JSON schema only."
+        "policy passages: assess EVERY required criterion with evidence from the note, "
+        "then apply the rule — all required met → approve; a required one clearly not "
+        "met → deny; a required one not determinable from the note (undocumented) → "
+        "pend. Fix exactly what the auditor flagged. Respond using the provided JSON "
+        "schema only."
     )
     user = (f"POLICY PASSAGES:\n{_passages(passages)}\n\n"
             f"CLINICAL NOTE: {request['clinical_note']}\n\n"
@@ -86,8 +101,12 @@ def _revise(request: dict, det: dict, verdict: dict, passages: list[dict]) -> di
     return determination.validate(out)
 
 
-def run_triage(request: dict, max_revisions: int = 2, log=None) -> dict:
+def run_triage(request: dict, max_revisions: int = 2, log=None, sloppy_reviewer: bool = False) -> dict:
     """Run the multi-agent triage for one PA request.
+
+    ``sloppy_reviewer=True`` is a labelled DEMO FAULT (like Lab 3's sabotage
+    sliders): the first draft uses a rushed reviewer prompt so the Critic can be
+    seen catching it — revisions always use the careful prompt.
     Returns {determination, review, a2a, audit, passages, request, member}."""
     a2a: list[dict] = []
     audit: list[dict] = []
@@ -121,8 +140,12 @@ def run_triage(request: dict, max_revisions: int = 2, log=None) -> dict:
                 "passages": [], "request": request, "member": member}
 
     # ORCHESTRATOR → REVIEWER: draft a determination grounded in the criteria.
-    say("Orchestrator", "Reviewer", "Draft a determination grounded ONLY in those criteria.")
-    det = _review(request, member, passages)
+    say("Orchestrator", "Reviewer",
+        "Draft a determination grounded ONLY in those criteria."
+        + (" (⚠ demo fault: the reviewer is rushed)" if sloppy_reviewer else ""))
+    if sloppy_reviewer:
+        act("demo_fault", {"sloppy_reviewer": True})
+    det = _review(request, member, passages, sloppy=sloppy_reviewer)
     if not det:
         return {"determination": None, "review": None, "a2a": a2a, "audit": audit,
                 "passages": passages, "request": request, "member": member}

@@ -28,6 +28,8 @@ _MEMBERS = [
      "Outpatient PT covered; extended courses require prior auth beyond 12 visits."),
     ("M-1004", "Alex Chen", "Silver HMO",
      "Advanced imaging covered with prior auth."),
+    ("M-1005", "Riley Thompson", "Gold PPO",
+     "Advanced imaging covered with prior auth."),
 ]
 
 # (id, member_id, policy_id, service, clinical_note)  — the reviewer weighs the
@@ -49,6 +51,15 @@ _REQUESTS = [
     ("PA-5004", "M-1004", "CP-201", "Lumbar spine MRI (CPT 72148)",
      "History of prostate cancer, new unexplained weight loss and night pain. "
      "Physician suspects metastatic disease and requests urgent imaging."),
+    # PA-5005 is engineered to make the critique→revise loop VISIBLE: strong,
+    # detailed evidence for criteria 1–2 tempts a first-draft APPROVE, but the
+    # note is silent on criterion 3 (prior imaging) — the correct answer is PEND,
+    # and the Critic should catch a draft that misses it.
+    ("PA-5005", "M-1005", "CP-201", "Lumbar spine MRI (CPT 72148)",
+     "52 y/o with low back pain for 4 months. Completed 7 weeks of physical "
+     "therapy plus NSAIDs with persistent left-leg radicular pain; exam shows "
+     "positive straight-leg raise and diminished L5 sensation. New patient — "
+     "first visit to this practice."),
 ]
 
 

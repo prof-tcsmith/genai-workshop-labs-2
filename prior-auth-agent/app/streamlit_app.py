@@ -63,10 +63,20 @@ with st.container(border=True):
 
 # --- 2 · Run the agents ------------------------------------------------------
 st.subheader("2 · Run the triage agents")
+sloppy = st.toggle(
+    "🧪 Demo fault: make the Reviewer rushed (watch the Critic catch it)",
+    value=False,
+    help="Like Lab 3's sabotage sliders: the first draft uses a rushed reviewer prompt, so the "
+         "Critic (the LLM evaluator) visibly fails it and sends it back for revision. Revisions "
+         "always use the careful prompt.")
 if st.button("▶ Run the agents", type="primary"):
     st.session_state.pop("pa_submit", None)
-    with st.spinner("Orchestrator → Researcher → Reviewer → Critic, calling tools over MCP…"):
-        st.session_state["pa"] = agents.run_triage(request, max_revisions=2)
+    with st.status("Orchestrator running — agents coordinating over MCP…", expanded=True) as status:
+        def _live(frm: str, to: str, content: str) -> None:
+            status.write(f"**{frm} → {to}** · {content}")
+        st.session_state["pa"] = agents.run_triage(request, max_revisions=2, log=_live,
+                                                   sloppy_reviewer=sloppy)
+        status.update(label="Triage complete — full trace below", state="complete", expanded=False)
     st.session_state["pa_req"] = request
 
 pa = st.session_state.get("pa")
@@ -75,7 +85,11 @@ if pa and st.session_state.get("pa_req", {}).get("id") == request["id"]:
 
     # --- 3 · A2A timeline ----------------------------------------------------
     st.subheader("3 · Agent-to-agent (A2A) messages")
-    st.caption("Each agent is a separate set of LLM calls. This is them coordinating.")
+    st.caption(
+        "Honest labels: the **Reviewer** and **Critic** are LLM calls; the **Orchestrator** and "
+        "**Researcher** are deterministic code (routing + retrieval). Knowing which is which is "
+        "part of governing a system like this."
+    )
     for m in pa["a2a"]:
         st.markdown(f"**{m['from']} → {m['to']}**")
         st.info(m["content"])
@@ -104,9 +118,11 @@ if pa and st.session_state.get("pa_req", {}).get("id") == request["id"]:
     if not sub:
         st.subheader("5 · Human approval gate")
         st.warning(
-            "Nothing is recorded until a human signs off. Only the **Case-worker** agent may call "
-            "`submit_determination` (over MCP) — and only after this gate. In healthcare the human "
-            "in the loop is the point, not a formality."
+            "Nothing is recorded until a human signs off — **the agents never deny on their own**, "
+            "and when documentation is missing they **pend** (ask for more) rather than deny. Only "
+            "the **Case-worker** may call `submit_determination` (over MCP), and only after this "
+            "gate. In healthcare the human in the loop is the point, not a formality — recent U.S. "
+            "regulatory guidance on prior authorization requires exactly this kind of human review."
         )
         if st.button(f"✅ Approve & record: {det['decision'].upper()}", type="primary"):
             st.session_state["pa_submit"] = agents.submit(request, det, audit=pa["audit"])
