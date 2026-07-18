@@ -393,7 +393,7 @@ if state:
     # --- The transcript, for the curious -------------------------------------
     with st.expander("🔎 Full trace (every plan / call / observed result)"):
         st.json(state["trace"])
-    with st.expander("🧠 Raw message log sent to the model"):
+    with st.expander("🧠 Raw message log sent to the API"):
         st.caption("Note the assistant `tool_calls` turns and the role:'tool' replies — "
                    "the exact transcript the MCP client and server exchanged.")
         st.json(state["messages"])

@@ -494,7 +494,7 @@ const TOPIC = {
       bullets: [
         "One <b>system prompt</b> steers a capable model.",
         "The <b>user message</b> is the whole request — nothing hidden.",
-        "You can see <b>exactly what is sent</b> to the model, as JSON.",
+        "You can see <b>exactly what is sent</b> to the API, as JSON.",
         "Change the prompt (<i>'answer only in haiku'</i>) — behavior changes <b>instantly</b>.",
       ] },
 
@@ -504,7 +504,8 @@ const TOPIC = {
       bullets: [
         "<b>System prompt</b> = how you steer the model.",
         "<b>User message</b> = what the person types.",
-        "The <b>app</b> sends both to the model, which sees <b>only these two</b>.",
+        "The app sends both to the <b>API</b> as JSON — the provider then flattens them into <b>one token stream</b>, with special tokens marking each role.",
+        "So roles are a <b>convention, not a wall</b>: the model only ever reads tokens. (That is why prompt injection works.)",
         "It is <b>stateless</b> — nothing carries over between sends.",
       ] },
 
@@ -513,7 +514,7 @@ const TOPIC = {
     { h: "Try it in the demo", tag: "your turn",
       bullets: [
         "Type a <b>system prompt</b> + a <b>message</b>, then hit <b>Send</b>.",
-        "Open <b>\"Exactly what is sent to the model\"</b> — just two messages.",
+        "Open <b>\"Exactly what is sent to the API\"</b> — just two messages — then the panel beside it for what the <b>model</b> actually reads.",
         "Resend a follow-up — notice it <b>does not remember</b> the last turn.",
       ] },
 

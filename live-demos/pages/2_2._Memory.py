@@ -54,7 +54,7 @@ if prompt:
         answer, _ = stream_assistant(client, messages, placeholder=st.empty())
     history.append({"role": "assistant", "content": answer})
 
-with st.expander("🧠 Memory — exactly what the model sees every turn"):
+with st.expander("🧠 Memory — exactly what's re-sent to the API every turn"):
     st.caption(
         "The running history kept in `st.session_state`. On every turn we prepend "
         "the system prompt and send ALL of it — that's why it recalls earlier turns. "
