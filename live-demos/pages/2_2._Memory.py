@@ -25,6 +25,7 @@ st.caption(
 )
 render_slides("memory")
 
+st.markdown("##### ▶️ The app")
 system_prompt = st.text_area(
     "System prompt (how you steer the model)",
     "You are a helpful, concise assistant.",

@@ -18,55 +18,86 @@ st.info(
     "- a **system prompt** — your standing instructions that set the model's role, tone, "
     "and rules (how you steer the model); and\n"
     "- a **user prompt** — what the person types this turn (the experience).\n\n"
-    "Edit both below, hit Send, and open *“Exactly what is sent to the API”* — that "
-    "tiny payload **is** the whole application. (The panel next to it shows what the "
-    "*model* actually receives — they are not the same thing.)",
+    "Run it below, then look under the hood to see what your app sent — and what the "
+    "model actually processed.",
     icon="🧩",
 )
 
-sys = st.text_area("System prompt (how you steer the model)",
-                   "You are a helpful, concise assistant.", height=80)
-msg = st.text_input("Your message (the user prompt / the experience)",
-                    "Explain what a system prompt is, in one sentence.")
+# ════════════════════════ THE APP ════════════════════════
+# Everything inside this border is the running application: two inputs, one
+# button, one reply. Nothing is interleaved here — commentary lives below.
+st.markdown("##### ▶️ The app")
+app = st.container(border=True)
+with app:
+    sys = st.text_area("System prompt (how you steer the model)",
+                       "You are a helpful, concise assistant.", height=80)
+    msg = st.text_input("Your message (the user prompt / the experience)",
+                        "Explain what a system prompt is, in one sentence.")
+    send = st.button("Send", type="primary")
+    result = st.container()  # the reply renders here — still inside the border
 
-if st.button("Send", type="primary"):
-    messages = [{"role": "system", "content": sys}, {"role": "user", "content": msg}]
-    with st.expander("Exactly what is sent to the API"):
-        st.json(messages)
-        st.caption(
-            "This is the **API request** — the contract between your app and the provider. "
-            "It is *not* what the model itself reads. Open the next panel for that."
-        )
-    with st.expander("…and what the **model** actually sees"):
-        st.markdown(
-            "The model never sees JSON, and there is no field called `role` inside it. "
-            "Server-side, the provider flattens those messages into **one continuous token "
-            "sequence** using a **chat template** — reserved special tokens mark where each "
-            "turn begins and ends. Open-weight models publish their template; hosted models "
-            "(`gpt-4o-mini`, Claude) apply their own internally. Illustrative, Llama-3 style:"
-        )
-        st.code(
-            "<|begin_of_text|>"
-            "<|start_header_id|>system<|end_header_id|>\n\n"
-            f"{sys}<|eot_id|>"
-            "<|start_header_id|>user<|end_header_id|>\n\n"
-            f"{msg}<|eot_id|>"
-            "<|start_header_id|>assistant<|end_header_id|>\n\n",
-            language="text",
-        )
-        st.markdown(
-            "…and even that is a readable stand-in: the model consumes **token IDs**, not characters.\n\n"
-            "**Why this matters later today**\n"
-            "- **Roles are a convention, not a wall.** “System” is just text in a specially "
-            "marked region of one stream — nothing physically stops the model from obeying "
-            "instructions that arrive in *user* or *retrieved* text. That is why **prompt "
-            "injection** works (Lab 2, and the red-team take-home).\n"
-            "- **Memory isn't free.** Every turn re-serialises the whole history into this "
-            "stream, and you pay for it in tokens on **every** call (that's the next lab).\n"
-            "- **The context window is measured here** — in tokens of this stream, not in messages."
-        )
-    st.subheader("Response")
-    stream_assistant(client, messages, placeholder=st.empty())
+messages = [{"role": "system", "content": sys}, {"role": "user", "content": msg}]
+
+if send:
+    with result:
+        st.subheader("Response")
+        stream_assistant(client, messages, placeholder=st.empty())
+
+# ═══════════════════ CONCEPTS — UNDER THE HOOD ═══════════════════
+st.markdown("##### 🔬 Under the hood — the API request vs. what the model processes")
+st.caption("These update live as you edit the fields above. They are **not** the same thing.")
+
+left, right = st.columns(2)
+with left:
+    st.markdown("**① What your app sends to the API**")
+    st.json(messages)
+    st.caption(
+        "A **structured request** — a list of `role` / `content` objects, sent as JSON over "
+        "HTTPS. This is the contract between your app and the provider, and it is the part "
+        "**you** control."
+    )
+with right:
+    st.markdown("**② What the model actually processes**")
+    st.code(
+        "<|begin_of_text|>\n"
+        "<|start_header_id|>system<|end_header_id|>\n"
+        f"{sys}\n"
+        "<|eot_id|>\n"
+        "<|start_header_id|>user<|end_header_id|>\n"
+        f"{msg}\n"
+        "<|eot_id|>\n"
+        "<|start_header_id|>assistant<|end_header_id|>\n"
+        "▮  ← the model continues from here, one token at a time",
+        language="text",
+    )
+    st.caption(
+        "Server-side the provider flattens that JSON into **one flat token sequence** using a "
+        "**chat template** — reserved special tokens mark where each turn starts and stops. "
+        "Illustrative (Llama-3 style, line-broken for legibility); hosted models "
+        "(`gpt-4o-mini`, Claude) apply their own template internally. And even this is a "
+        "readable stand-in — the model reads **token IDs**, not characters."
+    )
+
+st.markdown(
+    "**The model is *autoregressive* — it never “answers a request.”** It is handed that one "
+    "sequence and predicts a **single next token**, appends it, and predicts again — over and "
+    "over — until it emits an end-of-turn token. Notice the stream on the right stops mid-turn, "
+    "right after `assistant`: the model is simply **continuing the text**. What you call “the "
+    "response” is just that continuation — which is exactly why you can watch it stream in token "
+    "by token, and why the reply becomes part of the context for whatever comes next."
+)
+st.markdown(
+    "**Three consequences you'll meet in the next labs**\n"
+    "- **Roles are a convention, not a wall.** “System” is just text in a specially marked "
+    "region of one stream. Nothing *physically* stops the model from following instructions "
+    "that arrive in *user* or *retrieved* text — that is why **prompt injection** works "
+    "(Lab 2, and the red-team take-home).\n"
+    "- **Memory isn't free.** There is no session on the server: every turn re-serialises the "
+    "whole history into this stream and you pay for it in tokens on **every** call (next lab).\n"
+    "- **The context window is measured here** — in tokens of this one sequence, not in messages."
+)
+
+if send:
     st.warning(
         "**What's missing — memory.** Send another message and it won't recall this one; "
         "each request is independent. **➡️ Next — Memory.** "

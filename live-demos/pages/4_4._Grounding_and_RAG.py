@@ -25,6 +25,7 @@ render_slides("grounding-rag")
 
 # --- 1. Pick the documents to put in the store, then build the index (cached) ---
 STEMS = ["refund_policy", "support_kb", "hr_leave_policy", "security_notes_RESTRICTED"]
+st.markdown("##### ▶️ The app")
 picked = st.multiselect(
     "Documents in the store", STEMS, default=["refund_policy", "support_kb"],
     help="Only these docs can be retrieved. The model has no other source of truth.",

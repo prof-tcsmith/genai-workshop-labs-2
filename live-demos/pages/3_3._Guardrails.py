@@ -43,6 +43,10 @@ SCOPE_CHECK_PROMPT = (
     "safe/benign. Answer with ONLY the single word 'yes' or 'no'."
 )
 
+# ════════════════════════ THE APP ════════════════════════
+# Controls + conversation run uninterrupted; the explanation of what the
+# guardrails *are* lives below, after the app.
+st.markdown("##### ▶️ The app")
 guardrails_on = st.toggle(
     "Guardrails ON",
     value=st.session_state.get("guardrails_on", True),
@@ -53,23 +57,6 @@ guardrails_on = st.toggle(
 if st.button("🧹 Clear conversation"):
     st.session_state["gr_history"] = []
     st.rerun()
-
-# --- Show exactly WHAT the guardrails are -------------------------------------
-with st.expander("🛡️ The guardrails — what they actually are", expanded=True):
-    st.markdown(
-        "**Two layers, not one.** A guardrail is *partly* a rule written into the system "
-        "prompt — but that alone is **soft** (a clever message can talk the model out of it). "
-        "So this demo also adds an **independent check** that runs *before* the main model."
-    )
-    st.markdown("**Guardrail 1 — a rule in the system prompt** (an instruction the model is asked to follow):")
-    st.code(SYSTEM_PROMPT, language="text")
-    st.markdown("**Guardrail 2 — an independent scope check** (a *separate* model call that runs first and can block the message before the main model ever sees it):")
-    st.code(SCOPE_CHECK_PROMPT, language="text")
-    st.caption(
-        "Guardrail 1 is 'just a document in the prompt' — necessary but bypassable. Guardrail 2 is a "
-        "separate, fail-closed gate. Production systems layer both, plus input/output filters, tool "
-        "RBAC, and approval gates (see the agent-loop lab)."
-    )
 
 # Memory carries over from the previous lab's idea: we keep + replay the conversation.
 st.session_state.setdefault("gr_history", [])
@@ -113,6 +100,23 @@ if prompt:
                        else "Guardrail: ⚠️ OFF — message answered without a scope check.")
 
     history.append({"role": "assistant", "content": answer})
+
+# ═══════════════ CONCEPTS — what the guardrails actually are ═══════════════
+st.markdown("##### 🛡️ Under the hood — what the guardrails actually are")
+st.markdown(
+    "**Two layers, not one.** A guardrail is *partly* a rule written into the system "
+    "prompt — but that alone is **soft** (a clever message can talk the model out of it). "
+    "So this demo also adds an **independent check** that runs *before* the main model."
+)
+st.markdown("**Guardrail 1 — a rule in the system prompt** (an instruction the model is asked to follow):")
+st.code(SYSTEM_PROMPT, language="text")
+st.markdown("**Guardrail 2 — an independent scope check** (a *separate* model call that runs first and can block the message before the main model ever sees it):")
+st.code(SCOPE_CHECK_PROMPT, language="text")
+st.caption(
+    "Guardrail 1 is 'just a document in the prompt' — necessary but bypassable. Guardrail 2 is a "
+    "separate, fail-closed gate. Production systems layer both, plus input/output filters, tool "
+    "RBAC, and approval gates (see the agent-loop lab)."
+)
 
 st.divider()
 st.warning(

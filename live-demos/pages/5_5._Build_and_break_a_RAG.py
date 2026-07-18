@@ -15,6 +15,7 @@ render_slides("build-break-rag")
 corpus_all = rag.load_corpus()
 default_docs = [n for n in corpus_all if "RESTRICTED" not in n]
 
+st.markdown("##### ▶️ The app")
 names = st.multiselect("Documents in the corpus", list(corpus_all.keys()), default=default_docs)
 
 c1, c2, c3 = st.columns(3)
