@@ -1,6 +1,6 @@
 import streamlit as st
 
-from shared.core import boot, chat, layer_badge
+from shared.core import boot, chat, layer_badge, try_this
 from shared import store as rag
 from shared.slides import render_slides
 
@@ -71,6 +71,19 @@ if st.button("Build index & answer", type="primary"):
         st.warning("**Conflicting / stale source retrieved** — watch the answer flip or hedge. Freshness and de-duplication are data-engineering problems, not model problems.")
     if tiny:
         st.warning("**Tiny chunks** fragment the policy, so a single chunk rarely contains the whole rule. Chunking is a design decision.")
+
+try_this(
+    "**Baseline first.** Leave every switch off, hit *Build index & answer*, and note the answer "
+    "and the chunks it retrieved. This is your control.",
+    "Tick **Tiny chunks (size 80)** and rebuild. The rule gets fragmented across chunks, so no "
+    "single chunk carries the whole answer. *You changed a number, not the model.*",
+    "Untick that, tick **Add a conflicting 'stale' policy**, rebuild. Watch the answer flip or "
+    "hedge — the model has no way to know which document is current.",
+    "Untick, then tick **Include the RESTRICTED doc**. Content the user should never see is now "
+    "in the answer. That is a permissions bug reaching the user through retrieval.",
+    "Turn on two at once. Failures compound, and the answer still reads perfectly fluent — which "
+    "is exactly why these bugs ship.",
+)
 
 st.divider()
 st.info("Lesson: retrieval quality dominates output quality. Most RAG failures are data-engineering failures the pipeline simply exposes.")

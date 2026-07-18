@@ -10,7 +10,7 @@ will attempt anything, on any topic. Guardrails come next.
 """
 import streamlit as st
 
-from shared.core import boot, layer_badge, stream_assistant
+from shared.core import boot, layer_badge, stream_assistant, try_this
 from shared.slides import render_slides
 
 client = boot("2 · Memory")
@@ -54,6 +54,18 @@ if prompt:
         messages = [{"role": "system", "content": system_prompt}] + history
         answer, _ = stream_assistant(client, messages, placeholder=st.empty())
     history.append({"role": "assistant", "content": answer})
+
+try_this(
+    "Tell it **“My name is Dana and I manage the Tampa team.”** Then ask **“What's my name?”** "
+    "It remembers — not because the model learned anything, but because your last message *and* "
+    "that one are both re-sent.",
+    "Ask a follow-up with a pronoun: **“How big is that team?”** Watch it resolve *that* from "
+    "the history. This is the whole difference from Lab 1.",
+    "Open the memory panel below after a few turns and watch the payload **grow**. Every turn "
+    "re-sends the entire conversation — that is what memory costs you, on every single call.",
+    "Hit **🧹 Clear conversation**, then ask **“What's my name?”** again. Gone. The “memory” was "
+    "only ever that list.",
+)
 
 with st.expander("🧠 Memory — exactly what's re-sent to the API every turn"):
     st.caption(

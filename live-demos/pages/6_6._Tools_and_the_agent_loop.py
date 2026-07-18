@@ -22,7 +22,7 @@ import operator
 import streamlit as st
 
 from shared import store
-from shared.core import boot, chat, layer_badge
+from shared.core import boot, chat, layer_badge, try_this
 from shared.slides import render_slides
 
 client = boot("6 · Tools & the agent loop")
@@ -397,6 +397,19 @@ if state:
         st.caption("Note the assistant `tool_calls` turns and the role:'tool' replies — "
                    "the exact transcript the MCP client and server exchanged.")
         st.json(state["messages"])
+
+try_this(
+    "Run the default goal and read the loop top to bottom: **plan → call a tool → observe the "
+    "result → decide again.** The model never touched your data — it asked for a named tool.",
+    "It stops at the **approval gate** before the refund. Click **Deny** and re-read the trace: "
+    "the write simply never happened. The gate is code, not a promise in the prompt.",
+    "Run it again and **Approve**. Same loop, same reasoning — the only difference is a human "
+    "said yes to that exact tool call with those exact arguments.",
+    "Now switch the approval toggle **off** and re-run. It completes with no pause at all. That "
+    "is the autonomy dial: you just moved it, and nothing warned you.",
+    "Change the goal to something with **no matching tool** — e.g. *“cancel the customer's "
+    "subscription”* — and watch how it copes. A tool it doesn't have is a thing it cannot do.",
+)
 
 st.divider()
 st.caption(

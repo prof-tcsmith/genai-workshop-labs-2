@@ -8,7 +8,7 @@ you can check them. Quality comes from the context you assemble, not cleverness.
 import streamlit as st
 
 from shared import store
-from shared.core import boot, layer_badge, stream_assistant
+from shared.core import boot, layer_badge, stream_assistant, try_this
 from shared.slides import render_slides
 
 client = boot("4 · Grounding & RAG")
@@ -90,6 +90,18 @@ if st.button("Answer both ways", type="primary") and question.strip():
         st.subheader("✅ Grounded on retrieved chunks")
         stream_assistant(client, grounded_messages, placeholder=st.empty())
         st.caption("Drawn from — and **citing** — the chunks above. You can check every claim.")
+
+try_this(
+    "Run the default question and read the two columns side by side. The left one *sounds* just "
+    "as confident — but only the right one can be checked against a source.",
+    "Ask something the corpus cannot answer: **“What is the CEO's mobile number?”** The grounded "
+    "side should **abstain**; watch whether the ungrounded side invents something.",
+    "Drop **Top-k** to 1 and re-ask the refund question. If the rule was split across chunks, the "
+    "answer quietly loses the detail — retrieval, not the model, decided that.",
+    "Remove **refund_policy** from the store and re-ask. The grounded answer should now say it "
+    "doesn't know. *Abstaining is engineered* — it comes from the instruction plus the missing "
+    "context, not from the model being humble.",
+)
 
 st.warning(
     "**What's missing — retrieval quality depends on your data + pipeline.** Bad chunking "

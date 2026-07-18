@@ -6,4 +6,4 @@ openai>=1.40
 anthropic>=0.40
 numpy>=1.26
 mcp>=1.2
-# rebuild-stamp: v1.3 — GenAI Day de-legacy release (2026-07-16)
+# rebuild-stamp: v1.4.4 — try_this() added to shared/core (2026-07-18)

@@ -254,6 +254,20 @@ def layer_badge(layers: list[int]) -> None:
     return None
 
 
+def try_this(*items: str, title: str = "✋ Try this") -> None:
+    """Hands-on experiments, rendered in a box directly beneath a lab's app.
+
+    These labs are a bench, not a lecture: every item names an ACTION to take in
+    the app above and the thing to NOTICE when you do. Keep them short enough to
+    run in seconds, and ordered so each one builds on the last.
+    """
+    with st.container(border=True):
+        st.markdown(f"##### {title}")
+        st.caption("Run these in the app above — each takes seconds, and each shows you something.")
+        for i, item in enumerate(items, start=1):
+            st.markdown(f"**{i}.** {item}")
+
+
 def _bump() -> None:
     n = st.session_state.get("_reqs", 0) + 1
     st.session_state["_reqs"] = n

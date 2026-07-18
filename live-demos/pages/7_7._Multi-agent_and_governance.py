@@ -25,7 +25,7 @@ import json
 import streamlit as st
 
 from shared import mcp_client
-from shared.core import boot, chat, layer_badge, stream_assistant, tool_calls_to_message
+from shared.core import boot, chat, layer_badge, stream_assistant, tool_calls_to_message, try_this
 from shared.slides import render_slides
 
 client = boot("7 · Multi-agent + governance")
@@ -274,6 +274,17 @@ if st.session_state["audit"]:
         st.markdown(f"`{i:02d}` **{e['event']}** — {json.dumps(e['detail'])}")
 else:
     st.write("No events yet — run the workflow.")
+
+try_this(
+    "Run the workflow, then read section **2 · A2A messages**. Each line is a *separate model "
+    "call* handing work to another agent — that hand-off is all “multi-agent” means.",
+    "Open **🔒 Prove RBAC** and fire the research-side write. It's refused in **code**, before "
+    "any model is consulted. Capability is not authorization.",
+    "At the **approval gate**, deny once and approve once. Compare the audit log each time — the "
+    "decision, not just the outcome, is recorded.",
+    "Read the **audit log** bottom-up and try to reconstruct who did what, with which tool, and "
+    "who approved it. If you can't answer that from the log, you can't defend the system.",
+)
 
 st.divider()
 st.info(
