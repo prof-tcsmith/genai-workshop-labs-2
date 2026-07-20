@@ -7,3 +7,5 @@ anthropic>=0.40
 numpy>=1.26
 mcp>=1.2
 # rebuild-stamp: v1.4.4 — try_this() added to shared/core (2026-07-18)
+
+# cache-bust: 2026-07-20 seven-lab renumbering

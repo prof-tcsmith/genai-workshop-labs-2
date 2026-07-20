@@ -9,7 +9,7 @@ policy** — grounded in retrieval, governed by a human, over a real MCP server.
 > a demonstration of AI **system architecture**, not a medical device, and not medical
 > advice.
 
-## What it demonstrates (the five labs, assembled)
+## What it demonstrates (the seven labs, assembled)
 
 | Lab | Concept | Where it shows up here |
 |---|---|---|

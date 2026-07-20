@@ -104,7 +104,7 @@ st.markdown(
     "- **Roles are a convention, not a wall.** “System” is just text in a specially marked "
     "region of one stream. Nothing *physically* stops the model from following instructions "
     "that arrive in *user* or *retrieved* text — that is why **prompt injection** works "
-    "(Lab 2, and the red-team take-home).\n"
+    "(Lab 3, and the red-team take-home).\n"
     "- **Memory isn't free.** There is no session on the server: every turn re-serialises the "
     "whole history into this stream and you pay for it in tokens on **every** call (next lab).\n"
     "- **The context window is measured here** — in tokens of this one sequence, not in messages."

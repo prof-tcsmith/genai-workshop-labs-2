@@ -143,5 +143,5 @@ st.info(
     "**The point:** an orchestrator + specialist agents (A2A) reach real tools over **MCP**, ground "
     "every decision in retrieved policy, run a **critique→revise** loop where an **LLM evaluates** "
     "the draft, and stay **governed** (RBAC on the write + a human approval gate + an audit log). "
-    "This is the five labs, assembled."
+    "This is the seven labs, assembled."
 )

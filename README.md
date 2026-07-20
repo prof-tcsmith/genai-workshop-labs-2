@@ -11,8 +11,8 @@ A GenAI system is assembled from a handful of core components — the **building
 
 | Folder | What it is | Run it |
 |---|---|---|
-| **`live-demos/`** | **The building blocks** — five labs, each breaking the one before (chatbot+memory → guardrails → grounding/RAG & build-and-break → tools/agent loop → multi-agent+governance), plus two take-home labs (red-team → evaluate & validate) | `cd live-demos && docker compose up`, or hosted on Streamlit Cloud |
-| **`prior-auth-agent/`** | **The Case** — the five labs assembled into one agentic system (Prior-Authorization Triage): specialist agents over A2A + a real MCP server, RAG-grounded, an LLM critic, and a human approval gate + audit. Synthetic data. | `cd prior-auth-agent && docker compose up` (OpenAI key only) |
+| **`live-demos/`** | **The building blocks** — seven labs (one per app page), each stage breaking the one before (chatbot+memory → guardrails → grounding/RAG & build-and-break → tools/agent loop → multi-agent+governance), plus two take-home labs (red-team → evaluate & validate) | `cd live-demos && docker compose up`, or hosted on Streamlit Cloud |
+| **`prior-auth-agent/`** | **The Case** — the seven labs assembled into one agentic system (Prior-Authorization Triage): specialist agents over A2A + a real MCP server, RAG-grounded, an LLM critic, and a human approval gate + audit. Synthetic data. | `cd prior-auth-agent && docker compose up` (OpenAI key only) |
 | **`course-content-studio/`** | A larger applied build — turns your course materials into a Canvas-ready quiz using a real vector DB, database, and MCP service | `streamlit run course-content-studio/app.py` or host it |
 | **`mcp-lab/`** | An MCP tool server (advanced) | see `mcp-lab/README.md` |
 | **`docs/`** | The slide deck + a browser prompt lab (served via GitHub Pages) | open `docs/index.html` |
