@@ -41,7 +41,7 @@ docker compose up --build
 open http://localhost:8501
 ```
 
-`APP_PORT=8600 docker compose up` if 8501 is taken. Two containers come up: the
+if 8501 is taken, add the line `APP_PORT=8502` to your `.env` and re-run (on macOS/Linux you can instead prefix: `APP_PORT=8502 docker compose up`). Two containers come up: the
 `mcp-server` (tool catalog, internal network only) and the `app` (agents + UI).
 
 ## Run without Docker (dev)
