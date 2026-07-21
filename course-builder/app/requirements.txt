@@ -1,3 +1,0 @@
-streamlit>=1.36
-openai>=1.40
-mcp>=1.2

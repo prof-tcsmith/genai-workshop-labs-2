@@ -125,14 +125,7 @@ docker compose up
 ```
 *Synthetic data — a demonstration of AI system architecture, not medical advice.*
 
-### 7. (Advanced, optional) Course Content Studio
-The **Course Content Studio** app turns your slides/readings into a Canvas-importable quiz. It
-uses real backing services (a vector DB + a database), so it's **not** part of the Docker bundle:
-- **Easiest:** use the **hosted version** (the facilitator shares the URL + a participant code).
-- **Run it locally:** it needs your own **Pinecone** + **Neon** (both free tiers) — paste the keys
-  in its **🔌 Connections** sidebar. Step-by-step: `course-content-studio/SETUP.md`.
-
-### 8. Stop and clean up
+### 7. Stop and clean up
 - Stop: press **Ctrl-C** in the terminal.
 - Remove the containers: `docker compose down`.
 

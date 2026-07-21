@@ -1,51 +1,70 @@
-# GenAI Workshop — labs & live demos
+# The Building Blocks of GenAI — workshop labs
 
-Hands-on material for the *Enterprise AI for Information Systems Faculty* workshop.
-Everything runs in your browser or in Docker. **You supply your own OpenAI API key** —
-no key is included in this repository. The facilitator will hand one out at the session
-(or use your own); paste it where prompted, or set it locally as described below.
+GenAI Day · Dr. Tim Smith · USF Muma College of Business
 
-A GenAI system is assembled from a handful of core components — the **building blocks of GenAI**.
+Nine hands-on labs (seven in the session, two take-home), a standalone MCP lab, and one
+applied Case. Everything here runs on **your machine with Docker** — or use the hosted app
+at **[muma-genai.streamlit.app](https://muma-genai.streamlit.app)** (`tinyurl.com/muma-genai`).
 
-## What's here
+Slides & extras: **[prof-tcsmith.github.io/genai-workshop-labs](https://prof-tcsmith.github.io/genai-workshop-labs)**
+(intro + closing decks, the deep-dive deck, and the browser prompt lab).
 
-| Folder | What it is | Run it |
-|---|---|---|
-| **`live-demos/`** | **The building blocks** — seven labs (one per app page), each stage breaking the one before (chatbot+memory → guardrails → grounding/RAG & build-and-break → tools/agent loop → multi-agent+governance), plus two take-home labs (red-team → evaluate & validate) | `cd live-demos && docker compose up`, or hosted on Streamlit Cloud |
-| **`prior-auth-agent/`** | **The Case** — the seven labs assembled into one agentic system (Prior-Authorization Triage): specialist agents over A2A + a real MCP server, RAG-grounded, an LLM critic, and a human approval gate + audit. Synthetic data. | `cd prior-auth-agent && docker compose up` (OpenAI key only) |
-| **`course-content-studio/`** | A larger applied build — turns your course materials into a Canvas-ready quiz using a real vector DB, database, and MCP service | `streamlit run course-content-studio/app.py` or host it |
-| **`mcp-lab/`** | An MCP tool server (advanced) | see `mcp-lab/README.md` |
-| **`docs/`** | The slide deck + a browser prompt lab (served via GitHub Pages) | open `docs/index.html` |
-
-## Quick start (participants)
-
-You need a terminal, **Docker** (Docker Desktop or OrbStack, running), and **git**.
-Full step-by-step with prerequisites: see **`PARTICIPANT-GUIDE.md`**.
+## Run the labs (Docker)
 
 ```bash
 git clone https://github.com/prof-tcsmith/genai-workshop-labs.git
 cd genai-workshop-labs
-cp .env.example .env
-docker compose up
+docker compose up        # first run pulls two prebuilt images (~250 MB)
 ```
 
-Paste the OpenAI key into `.env` after copying it (or paste it in the app sidebar later);
-`docker compose up` pulls the prebuilt images from Docker Hub.
-Then open **http://localhost:8501** (live demos) and **http://localhost:8000** (MCP lab).
-Walk Labs 1 → 5; each breaks the one before and assembles another building block.
-Stop with **Ctrl-C**; `docker compose down` to remove the containers.
+- **http://localhost:8501** — the labs app (Labs 1–7 + take-home Labs 8–9)
+- **http://localhost:8000/mcp** — the standalone MCP lab server (point the MCP Inspector
+  or Claude Desktop at it)
 
-## Your OpenAI key
+**Your OpenAI key** (never inside the images — supply it at runtime, pick one):
 
-- **It is not in this repo.** Provide it one of three ways: paste it into any app's sidebar,
-  put it in `live-demos/.env` (gitignored), or — for hosted Streamlit — set it in the
-  app's Secrets. The browser prompt lab takes the key on the page.
-- Please be gentle: it may be a shared, budget-capped key. Don't paste sensitive data.
+- *Easiest:* pick a provider in the app **sidebar** and paste the key — held in your browser
+  session only; or
+- `cp .env.example .env` and set `OPENAI_API_KEY` (`.env` is gitignored).
 
-## Guides
+The RAG labs (4–5) need the **OpenAI** key even with Anthropic chat — embeddings are always OpenAI.
+Full setup details: [PARTICIPANT-GUIDE.md](PARTICIPANT-GUIDE.md).
 
-- `attendee-guide.pdf` — one-pager for participants.
-- `live-demos-guide.pdf` — facilitator setup & management for the live demos.
-- `BUILD-IT-YOURSELF.md` — one prompt per lab: paste into Claude Code to rebuild each lab, bare-bones.
-- `workshop-companion.pdf` — expanded notes for every slide in the deck.
-- `DEPLOY.md` — how to host the labs (Streamlit Community Cloud + GitHub Pages).
+## The labs
+
+| Lab | | Page |
+|---|---|---|
+| 1 | A model becomes an app | Chatbot |
+| 2 | It forgets your last sentence | Memory |
+| 3 | It will answer anything | Guardrails |
+| 4 | Ground it in your documents | Grounding & RAG |
+| 5 | Then break it | Build & break a RAG |
+| 6 | It knows, but can't act | Tools & the agent loop |
+| 7 | Agents over MCP + A2A | Multi-agent & governance |
+| 8–9 | Take-home | Red-team · Evaluate & validate |
+
+## The Case — Prior-Authorization Triage (homework)
+
+The seven labs, assembled into one governed agentic system: specialist agents over **A2A** +
+a real **MCP server**, RAG-grounded, an LLM critic, a human approval gate + audit log.
+
+```bash
+cd prior-auth-agent
+docker compose up --build      # builds from source; OpenAI key via .env or env var
+```
+
+If port 8501 is taken, add `APP_PORT=8502` to your `.env`.
+*Synthetic data — a demonstration of AI system architecture, not medical advice.*
+
+## Build it yourself
+
+[`BUILD-IT-YOURSELF.md`](BUILD-IT-YOURSELF.md) — one prompt per lab: paste into Claude Code
+and it builds a bare-bones version of that lab, ready to push to your own Streamlit app.
+
+## Key safety
+
+The Docker images are public and contain **no keys** — verified before every push. A pasted
+key lives only in your browser session; a `.env` key stays on your machine (gitignored).
+
+---
+(c) Dr. Tim Smith, 2026

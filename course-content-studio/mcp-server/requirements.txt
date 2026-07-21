@@ -1,4 +1,0 @@
-mcp>=1.2
-pinecone>=5.0
-psycopg[binary]>=3.1
-openai>=1.40
