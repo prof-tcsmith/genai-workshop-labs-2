@@ -10,12 +10,18 @@ a GitHub repo linked to Streamlit Community Cloud, and an OpenAI API key.
 **The loop:** paste a prompt into Claude Code → review what it writes → `streamlit run app.py`
 to try it locally → `git push` → Streamlit Community Cloud redeploys.
 
-Work in an empty folder inside a git repo that Streamlit Community Cloud is linked to. Paste ONE prompt into Claude (Claude Code); it should produce a bare-bones app — no teaching commentary, just the working application. Every prompt assumes: Python, Streamlit, the official openai package, model gpt-4o-mini, and the OpenAI key read from a password-type sidebar input with an OPENAI_API_KEY environment-variable fallback (warn and stop if neither is set).
+Work in an empty folder inside a git repo that Streamlit Community Cloud is linked to. Paste ONE prompt into Claude (Claude Code); it should produce a bare-bones app — no teaching commentary, just the working application. Every prompt assumes: Python · Streamlit · the official openai package · model gpt-4o-mini · python-dotenv, a .gitignore that excludes .env, and this key-resolution order in the code: a password-type sidebar input → st.secrets → the OPENAI_API_KEY environment variable (call load_dotenv() at startup so a local .env works) — warn and stop if none is set.
+
+**Providing the key — once per environment:**
+
+- Running locally: put OPENAI_API_KEY=sk-... in a .env file beside app.py. It is gitignored, so it is never committed — which also means it never reaches the server.
+- Deployed on Streamlit Community Cloud: the server cannot see your .env. In the app's menu open Settings → Secrets and add the key–value pair OPENAI_API_KEY = "sk-...".
+- Anywhere, per session: the sidebar paste box always works and stores nothing.
 
 ## Lab 1 — Chatbot (a model becomes an app)
 
 ```text
-Build a minimal Streamlit chatbot in a single app.py. UI, in order: a text area for a system prompt (default 'You are a helpful, concise assistant.'), a text input for the user's message, and a Send button. On Send, call the OpenAI chat completions API with exactly two messages — the system prompt and the user message — and stream the reply into the page as it arrives. No memory of any kind: every Send sends only those two messages. Keep the UI bare — no explanations or extra text. Create app.py and requirements.txt (streamlit, openai), commit, and push so Streamlit Community Cloud redeploys.
+Build a minimal Streamlit chatbot in a single app.py. UI, in order: a text area for a system prompt (default 'You are a helpful, concise assistant.'), a text input for the user's message, and a Send button. On Send, call the OpenAI chat completions API with exactly two messages — the system prompt and the user message — and stream the reply into the page as it arrives. No memory of any kind: every Send sends only those two messages. Keep the UI bare — no explanations or extra text. Create app.py, requirements.txt (streamlit, openai, python-dotenv), and a .gitignore that excludes .env; commit, and push so Streamlit Community Cloud redeploys.
 ```
 
 ## Lab 2 — Memory (replay the history)
@@ -33,7 +39,7 @@ Build a scoped support chatbot for a fictional SaaS product, 'Northwind Cloud', 
 ## Lab 4 — Grounding & RAG (retrieve · cite · abstain)
 
 ```text
-Build a RAG comparison app. Ship 2–3 short markdown policy docs in a corpus/ folder — include a refund policy stating enterprise customers get 45 days and standard customers 30. On first run, split the docs into ~600-character chunks, embed each with text-embedding-3-small, and hold the vectors in memory with numpy. UI: a question input (default: the enterprise refund window), a top-k slider (1–6, default 3), and an 'Answer both ways' button. On click: embed the query, retrieve the top-k chunks by cosine similarity, show them in an expander with scores, then render two columns — LEFT 'Model alone', answering from the bare question; RIGHT 'Grounded', where the system rule is: answer ONLY from the provided context, cite the source doc in brackets, and if the answer is not in the context, say you don't know. requirements: streamlit, openai, numpy. Commit, push.
+Build a RAG comparison app. Ship 2–3 short markdown policy docs in a corpus/ folder — include a refund policy stating enterprise customers get 45 days and standard customers 30. On first run, split the docs into ~600-character chunks, embed each with text-embedding-3-small, and hold the vectors in memory with numpy. UI: a question input (default: the enterprise refund window), a top-k slider (1–6, default 3), and an 'Answer both ways' button. On click: embed the query, retrieve the top-k chunks by cosine similarity, show them in an expander with scores, then render two columns — LEFT 'Model alone', answering from the bare question; RIGHT 'Grounded', where the system rule is: answer ONLY from the provided context, cite the source doc in brackets, and if the answer is not in the context, say you don't know. requirements: streamlit, openai, numpy, python-dotenv. Commit, push.
 ```
 
 ## Lab 5 — Break the RAG (data failures)
@@ -51,7 +57,7 @@ Build an agent-loop app with a human approval gate. Define two Python tools and 
 ## Lab 7 — Multi-agent over MCP (governed specialists)
 
 ```text
-Build a minimal multi-agent refund workflow with governed tools. Put get_order and issue_refund behind a FastMCP server defined in mcp_tools.py, and call them ONLY through an in-process MCP client session (mcp package >= 1.2, create_connected_server_and_client_session) — the app must never import the tool functions directly. Two agents, each its own chat completion with its own system prompt: a RESEARCH agent allowed only to read (get_order), returning findings as JSON, and an ACTION agent that drafts the refund decision and may call issue_refund. A deterministic orchestrator passes messages between them and renders an A2A-style timeline (who → whom, one-line summary). Enforce an RBAC dict mapping agent → allowed tools; block and record any disallowed request. Gate issue_refund behind Approve / Deny buttons. Append every tool call, RBAC decision, and approval to an audit log rendered at the bottom. requirements: streamlit, openai, mcp. Commit, push.
+Build a minimal multi-agent refund workflow with governed tools. Put get_order and issue_refund behind a FastMCP server defined in mcp_tools.py, and call them ONLY through an in-process MCP client session (mcp package >= 1.2, create_connected_server_and_client_session) — the app must never import the tool functions directly. Two agents, each its own chat completion with its own system prompt: a RESEARCH agent allowed only to read (get_order), returning findings as JSON, and an ACTION agent that drafts the refund decision and may call issue_refund. A deterministic orchestrator passes messages between them and renders an A2A-style timeline (who → whom, one-line summary). Enforce an RBAC dict mapping agent → allowed tools; block and record any disallowed request. Gate issue_refund behind Approve / Deny buttons. Append every tool call, RBAC decision, and approval to an audit log rendered at the bottom. requirements: streamlit, openai, mcp, python-dotenv. Commit, push.
 ```
 
 ---
