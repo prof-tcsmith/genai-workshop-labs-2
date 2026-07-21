@@ -1,17 +1,25 @@
 <!doctype html>
 <!-- Follow-along redirect for live sessions (QR codes + the short URL point HERE).
-     If the Streamlit app URL ever changes, edit ONE line below and every printed
-     QR / short link keeps working. -->
+     TWO app instances share the load: JS picks one at random, 50/50. If either
+     app URL ever changes, edit the APPS list below and every printed QR / short
+     link keeps working. No-JS fallback: the meta refresh goes to instance 1. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <title>GenAI workshop — follow along</title>
-<meta http-equiv="refresh" content="0; url=https://muma-genai.streamlit.app/" />
-<script>location.replace("https://muma-genai.streamlit.app/")</script>
-<style>body{font-family:system-ui,sans-serif;background:#0b1020;color:#eaf0ff;display:grid;place-items:center;min-height:100vh;margin:0}a{color:#6ea8fe}</style>
+<meta http-equiv="refresh" content="2; url=https://muma-genai.streamlit.app/" />
+<script>
+  var APPS = [
+    "https://muma-genai.streamlit.app/",
+    "https://genai-workshop-labs-2.streamlit.app/"
+  ];
+  location.replace(APPS[Math.floor(Math.random() * APPS.length)]);
+</script>
+<style>body{font-family:system-ui,sans-serif;background:#0b1020;color:#eaf0ff;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}a{color:#6ea8fe}</style>
 </head>
 <body>
-<p>Opening the demos… if nothing happens,
-<a href="https://muma-genai.streamlit.app/">tap here</a>.</p>
+<p>Opening the demos… if nothing happens, tap either instance:<br/>
+<a href="https://muma-genai.streamlit.app/">muma-genai.streamlit.app</a> ·
+<a href="https://genai-workshop-labs-2.streamlit.app/">genai-workshop-labs-2.streamlit.app</a></p>
 </body>
 </html>
