@@ -445,9 +445,9 @@ function Arch() {
       ${Box({x:6,   y, w:92,  h, lines:["User turn"], accent:C.accent})}
       ${HArrow({x1:98,  x2:150, y:mid, label:"check first"})}
       ${Box({x:150, y, w:120, h, lines:["Scope check","(separate LLM)"], accent:C.violet, fs:11})}
-      ${DArrow({x1:270, y1:y+14, x2:330, y2:198, color:C.danger, label:"BLOCK", lx:296, ly:176})}
+      ${DArrow({x1:270, y1:y+36, x2:330, y2:198, color:C.danger, label:"BLOCK", lx:296, ly:176})}
       ${Box({x:330, y:184, w:200, h:44, lines:["main model never called"], accent:C.danger, fs:11})}
-      ${DArrow({x1:270, y1:y+36, x2:330, y2:mid, color:C.ok, label:"PASS", lx:298, ly:66})}
+      ${DArrow({x1:270, y1:y+14, x2:330, y2:mid, color:C.ok, label:"PASS", lx:298, ly:66})}
       ${Box({x:330, y, w:142, h, lines:["System prompt","+ history"], fs:12})}
       ${HArrow({x1:472, x2:524, y:mid, label:"send"})}
       ${Box({x:524, y, w:70,  h, lines:["LLM"], accent:C.accent2})}
