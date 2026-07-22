@@ -35,6 +35,7 @@ q = st.text_input("Question", "What is the enterprise refund window?")
 
 if st.button("Build index & answer", type="primary"):
     eff_size = 80 if tiny else size
+    eff_overlap = min(overlap, eff_size // 2)  # overlap can't exceed half the chunk size
     docs = {n: corpus_all[n] for n in names}
     if leak and "security_notes_RESTRICTED" in corpus_all:
         docs["security_notes_RESTRICTED"] = corpus_all["security_notes_RESTRICTED"]
@@ -49,7 +50,7 @@ if st.button("Build index & answer", type="primary"):
         st.stop()
 
     with st.spinner("Chunking + embedding + indexing…"):
-        index = ragstore.rebuild(client, docs, size=eff_size, overlap=overlap, scope="lab5")
+        index = ragstore.rebuild(client, docs, size=eff_size, overlap=eff_overlap, scope="lab5")
     hits = ragstore.search(client, index, q, k=k)
     ragstore.render_backend_badge(index)
     context = "\n\n".join(f"[{d['doc']}] {d['text']}" for d, _ in hits)
@@ -61,7 +62,7 @@ if st.button("Build index & answer", type="primary"):
 
     st.subheader("Answer")
     st.write(ans)
-    st.caption(f"Index: {len(index['items'])} chunks · size {eff_size} · overlap {overlap}")
+    st.caption(f"Index: {len(index['items'])} chunks · size {eff_size} · overlap {eff_overlap}")
 
     with st.expander("Retrieved chunks", expanded=True):
         for d, s in hits:

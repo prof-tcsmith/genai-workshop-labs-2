@@ -28,6 +28,11 @@ def load_corpus(names: list[str] | None = None) -> dict[str, str]:
 
 def chunk(text: str, size: int = 600, overlap: int = 100) -> list[str]:
     text = text.strip()
+    size = max(1, size)
+    # Overlap must stay below the chunk size, or the step collapses to 1 char and
+    # the chunk count explodes (e.g. size 80 + overlap 100 → one chunk per char).
+    # Cap it at half the size — a sane maximum that keeps step ≥ size/2.
+    overlap = min(max(0, overlap), size // 2)
     step = max(1, size - overlap)
     out, i = [], 0
     while i < len(text):
@@ -46,11 +51,16 @@ def embed(client, texts: list[str]) -> np.ndarray:
             "`OPENAI_API_KEY` (or paste an OpenAI key with the provider set to OpenAI)."
         )
         st.stop()
+    # The OpenAI embeddings API caps a single request at 2048 inputs — batch so a
+    # large chunk count (e.g. the tiny-chunks lab) never trips a 400.
+    vectors: list = []
     try:
-        r = client.embed_raw.embeddings.create(model=client.embed_model, input=texts)
+        for i in range(0, len(texts), 1024):
+            r = client.embed_raw.embeddings.create(model=client.embed_model, input=texts[i:i + 1024])
+            vectors.extend(d.embedding for d in r.data)
     except Exception as e:
         api_guard(e)  # friendly message + st.stop()
-    m = np.array([d.embedding for d in r.data], dtype=np.float32)
+    m = np.array(vectors, dtype=np.float32)
     n = np.linalg.norm(m, axis=1, keepdims=True)
     n[n == 0] = 1.0
     return m / n
