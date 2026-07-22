@@ -1,6 +1,7 @@
 import streamlit as st
 
 from shared.core import boot, chat, layer_badge, try_this
+from shared import ragstore
 from shared import store as rag
 from shared.slides import render_slides
 
@@ -47,9 +48,10 @@ if st.button("Build index & answer", type="primary"):
         st.warning("Add at least one document to the corpus.")
         st.stop()
 
-    with st.spinner("Chunking + embedding…"):
-        index = rag.build_index(client, docs, size=eff_size, overlap=overlap)
-    hits = rag.search(client, index, q, k=k)
+    with st.spinner("Chunking + embedding + indexing…"):
+        index = ragstore.rebuild(client, docs, size=eff_size, overlap=overlap, scope="lab5")
+    hits = ragstore.search(client, index, q, k=k)
+    ragstore.render_backend_badge(index)
     context = "\n\n".join(f"[{d['doc']}] {d['text']}" for d, _ in hits)
     msgs = [
         {"role": "system", "content": "Answer ONLY from the provided context. If sources conflict, say so and name them. Quote the source you used."},

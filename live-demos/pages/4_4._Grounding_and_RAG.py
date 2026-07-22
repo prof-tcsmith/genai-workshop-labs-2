@@ -7,7 +7,7 @@ you can check them. Quality comes from the context you assemble, not cleverness.
 """
 import streamlit as st
 
-from shared import store
+from shared import ragstore, store
 from shared.core import boot, layer_badge, stream_assistant, try_this
 from shared.slides import render_slides
 
@@ -34,16 +34,20 @@ if not picked:
     st.info("Pick at least one document to build the store.")
     st.stop()
 
-key = "rag_index_" + "_".join(sorted(picked))
-if key not in st.session_state:
+# Rebuild the store whenever the document selection changes (a Pinecone rebuild
+# starts a fresh per-session namespace and retires the old one).
+sig = tuple(sorted(picked))
+if st.session_state.get("rag4_sig") != sig or "rag4_handle" not in st.session_state:
     docs = store.load_corpus(names=picked)
     if not docs:
         st.error("No corpus found at shared/corpus/.")
         st.stop()
-    with st.spinner("Building the information store (embedding the corpus once)…"):
-        st.session_state[key] = store.build_index(client, docs)
-index = st.session_state[key]
+    with st.spinner("Building the information store (embedding the corpus)…"):
+        st.session_state["rag4_handle"] = ragstore.rebuild(client, docs, scope="lab4")
+        st.session_state["rag4_sig"] = sig
+index = st.session_state["rag4_handle"]
 st.caption(f"📚 Store ready: **{len(index['items'])} chunks** from {len(picked)} document(s).")
+ragstore.render_backend_badge(index)
 store.render_doc_viewer(store.load_corpus(names=picked))
 
 # --- 2. The question + how many chunks to retrieve ---
@@ -57,7 +61,7 @@ if st.button("Answer both ways", type="primary") and question.strip():
     q = question.strip()
 
     # --- 3. Retrieve top-k chunks and show them transparently ---
-    hits = store.search(client, index, q, k=top_k)
+    hits = ragstore.search(client, index, q, k=top_k)
     with st.expander(f"🔎 Retrieved chunks — top {len(hits)} (cosine similarity)", expanded=True):
         if not hits:
             st.write("No chunks retrieved.")

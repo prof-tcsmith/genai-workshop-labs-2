@@ -6,6 +6,7 @@ openai>=1.40
 anthropic>=0.40
 numpy>=1.26
 mcp>=1.2
+pinecone>=5.0
 # rebuild-stamp: v1.4.4 — try_this() added to shared/core (2026-07-18)
 
-# cache-bust: 2026-07-22 doc viewer in RAG labs (shared/store.py changed)
+# cache-bust: 2026-07-22b RAG labs on Pinecone (ragstore.py; new shared module)
