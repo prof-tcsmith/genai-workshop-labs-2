@@ -44,6 +44,7 @@ if key not in st.session_state:
         st.session_state[key] = store.build_index(client, docs)
 index = st.session_state[key]
 st.caption(f"📚 Store ready: **{len(index['items'])} chunks** from {len(picked)} document(s).")
+store.render_doc_viewer(store.load_corpus(names=picked))
 
 # --- 2. The question + how many chunks to retrieve ---
 question = st.text_input(
@@ -92,8 +93,9 @@ if st.button("Answer both ways", type="primary") and question.strip():
         st.caption("Drawn from — and **citing** — the chunks above. You can check every claim.")
 
 try_this(
-    "Run the default question and read the two columns side by side. The left one *sounds* just "
-    "as confident — but only the right one can be checked against a source.",
+    "Open **📄 View the documents in the store** and read the source the model grounds on. Then run "
+    "the default question: both columns *sound* confident — but only the grounded one cites a line "
+    "you just read, so only it can be checked.",
     "Ask something the corpus cannot answer: **“What is the CEO's mobile number?”** The grounded "
     "side should **abstain**; watch whether the ungrounded side invents something.",
     "Drop **Top-k** to 1 and re-ask the refund question. If the rule was split across chunks, the "

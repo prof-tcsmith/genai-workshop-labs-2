@@ -66,6 +66,29 @@ def build_index(client, docs: dict[str, str], size: int = 600, overlap: int = 10
     return {"items": items, "matrix": embed(client, [it["text"] for it in items])}
 
 
+def render_doc_viewer(docs: dict[str, str], *, label: str = "📄 View the documents in the store") -> None:
+    """Click-to-expand panel: the full source text the model grounds on.
+
+    Participants ground answers on these docs but otherwise can't read them, so
+    they can't check a "cited" answer against its source. This shows them.
+    """
+    if not docs:
+        return
+    n = len(docs)
+    with st.expander(f"{label}  ·  {n} document{'s' if n != 1 else ''}"):
+        st.caption(
+            "This is the model's **only** source of truth. A grounded answer must trace "
+            "back to text you can read right here — that's what makes it checkable."
+        )
+        for name, text in docs.items():
+            restricted = "RESTRICTED" in name
+            st.markdown(
+                f"**📄 `{name}.md`**"
+                + ("  🔒 *restricted — normally should never reach a user*" if restricted else "")
+            )
+            st.code(text.strip(), language="markdown", wrap_lines=True)
+
+
 def search(client, index: dict, query: str, k: int = 4) -> list[tuple[dict, float]]:
     if not index.get("items"):
         return []

@@ -8,4 +8,4 @@ numpy>=1.26
 mcp>=1.2
 # rebuild-stamp: v1.4.4 — try_this() added to shared/core (2026-07-18)
 
-# cache-bust: 2026-07-21 wrap_lines on st.code (min streamlit 1.38)
+# cache-bust: 2026-07-22 doc viewer in RAG labs (shared/store.py changed)
