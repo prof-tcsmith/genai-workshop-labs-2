@@ -455,6 +455,112 @@ function Arch() {
   </div>`;
 }
 
+/* Canonical UML diagrams (same two on the printed one-pager) — authored from the lab page. */
+const SEQ_SVG_VALIDATE = `<svg viewBox="0 0 660 529" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="validate-seq-sf" markerWidth="10" markerHeight="10" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#5b6788"/></marker><marker id="validate-seq-so" markerWidth="12" markerHeight="10" refX="8.5" refY="3.2" orient="auto"><path d="M0,0 L8.5,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="90" y1="58" x2="90" y2="527" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="250" y1="58" x2="250" y2="527" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="410" y1="58" x2="410" y2="527" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="570" y1="58" x2="570" y2="527" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<rect x="182" y="152" width="456" height="211" rx="5" fill="none" stroke="#9aa7c4" stroke-width="1.1"/>
+<path d="M182,152 h52 v13 l-8,7 h-44 z" fill="#eef1f8" stroke="#9aa7c4" stroke-width="1.1"/>
+<text x="189" y="166" font-size="10.5" font-weight="800" fill="#39435f">loop</text>
+<text x="240" y="166" font-size="10.5" fill="#5b6788">[each golden question — 4 must-ground + 1 must-refuse]</text>
+<line x1="90" y1="80" x2="250" y2="80" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<path d="M250,113 h26 v16 h-26" fill="none" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<line x1="250" y1="186" x2="410" y2="186" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<line x1="410" y1="219" x2="250" y2="219" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#validate-seq-so)"/>
+<line x1="250" y1="252" x2="570" y2="252" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<line x1="570" y1="285" x2="250" y2="285" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#validate-seq-so)"/>
+<path d="M250,318 h26 v16 h-26" fill="none" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<path d="M264,361 h166 v60 h-166 z" fill="#fffbe8" stroke="#e6c96b" stroke-width="1"/>
+<text x="272" y="375" font-size="10.5" fill="#7a6a2e">control: one Q asked with</text>
+<text x="272" y="388" font-size="10.5" fill="#7a6a2e">vs without the source —</text>
+<text x="272" y="401" font-size="10.5" fill="#7a6a2e">shows a Not-grounded</text>
+<text x="272" y="414" font-size="10.5" fill="#7a6a2e">answer</text>
+<line x1="250" y1="416" x2="570" y2="416" stroke="#5b6788" stroke-width="1.6" marker-end="url(#validate-seq-sf)"/>
+<line x1="570" y1="449" x2="250" y2="449" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#validate-seq-so)"/>
+<path d="M264,470 h166 v60 h-166 z" fill="#fffbe8" stroke="#e6c96b" stroke-width="1"/>
+<text x="272" y="484" font-size="10.5" fill="#7a6a2e">roll up → go / no-go: any</text>
+<text x="272" y="497" font-size="10.5" fill="#7a6a2e">Critical fail = No-go</text>
+<text x="272" y="510" font-size="10.5" fill="#7a6a2e">(weigh by impact, not</text>
+<text x="272" y="523" font-size="10.5" fill="#7a6a2e">count)</text>
+<rect x="142" y="64" width="55" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="170" y="74" font-size="11" text-anchor="middle" fill="#5b6788">Run eval</text>
+<rect x="284" y="112" width="326" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/>
+<text x="447" y="122" font-size="11" text-anchor="middle" fill="#5b6788">build index over policy corpus (RESTRICTED excluded)</text>
+<rect x="278" y="170" width="104" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="180" font-size="11" text-anchor="middle" fill="#5b6788">search top-k = 3</text>
+<rect x="259" y="203" width="141" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="213" font-size="11" text-anchor="middle" fill="#5b6788">chunks + cosine scores</text>
+<rect x="278" y="236" width="264" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="246" font-size="11" text-anchor="middle" fill="#5b6788">grounded prompt — answer ONLY from context</text>
+<rect x="346" y="269" width="129" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="279" font-size="11" text-anchor="middle" fill="#5b6788">answer (or abstains)</text>
+<rect x="284" y="317" width="350" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/>
+<text x="459" y="327" font-size="11" text-anchor="middle" fill="#5b6788">grade: accept-string present? · record impact + evidence</text>
+<rect x="269" y="400" width="283" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="410" font-size="11" text-anchor="middle" fill="#5b6788">LLM-as-judge — is ANSWER supported by SOURCE?</text>
+<rect x="309" y="433" width="203" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="443" font-size="11" text-anchor="middle" fill="#5b6788">GROUNDED / NOT GROUNDED + reason</text>
+<rect x="21" y="6" width="138" height="52" rx="9" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<text x="90" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">You</text>
+<rect x="181" y="6" width="138" height="52" rx="9" fill="#e9fbf6" stroke="#12b886" stroke-width="1.6"/>
+<text x="250" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Eval app</text>
+<rect x="341" y="6" width="138" height="52" rx="9" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<text x="410" y="27" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Vector index</text>
+<text x="410" y="43" font-size="9.5" text-anchor="middle" fill="#5b6788">policy corpus</text>
+<rect x="501" y="6" width="138" height="52" rx="9" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<text x="570" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+</svg>`;
+const COMP_SVG_VALIDATE = `<svg viewBox="0 0 872 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="validate-comp-dep" markerWidth="12" markerHeight="10" refX="9" refY="3.2" orient="auto"><path d="M0,0 L9,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="186" y1="141" x2="238" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="186" y1="49" x2="462" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="410" y1="141" x2="462" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="634" y1="141" x2="686" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="686" y1="141" x2="634" y2="49" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="772" y1="110" x2="772" y2="80" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<line x1="548" y1="80" x2="548" y2="202" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#validate-comp-dep)"/>
+<rect x="14" y="18" width="172" height="62" rx="8" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<rect x="164" y="25" width="13" height="12" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="27" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="32" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/>
+<text x="100" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Golden set</text>
+<text x="100" y="60" font-size="10" text-anchor="middle" fill="#5b6788">fixed Q&amp;A · must-refuse ·</text>
+<text x="100" y="72" font-size="10" text-anchor="middle" fill="#5b6788">severity</text>
+<rect x="14" y="110" width="172" height="62" rx="8" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<rect x="164" y="117" width="13" height="12" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="119" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="124" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/>
+<text x="100" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Policy corpus</text>
+<text x="100" y="152" font-size="10" text-anchor="middle" fill="#5b6788">RESTRICTED excluded</text>
+<rect x="238" y="110" width="172" height="62" rx="8" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<rect x="388" y="117" width="13" height="12" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="384" y="119" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="384" y="124" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/>
+<text x="324" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Vector index</text>
+<text x="324" y="152" font-size="10" text-anchor="middle" fill="#5b6788">cosine top-k = 3</text>
+<rect x="462" y="18" width="172" height="62" rx="8" fill="#ffeef0" stroke="#e03131" stroke-width="1.6"/>
+<rect x="612" y="25" width="13" height="12" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="608" y="27" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="608" y="32" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/>
+<text x="548" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Rule grader</text>
+<text x="548" y="60" font-size="10" text-anchor="middle" fill="#5b6788">accept-string · abstain</text>
+<text x="548" y="72" font-size="10" text-anchor="middle" fill="#5b6788">check</text>
+<rect x="462" y="110" width="172" height="62" rx="8" fill="#eef1f6" stroke="#5b6788" stroke-width="1.6"/>
+<rect x="612" y="117" width="13" height="12" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="119" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="124" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/>
+<text x="548" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Retrieve top-k</text>
+<text x="548" y="152" font-size="10" text-anchor="middle" fill="#5b6788">evidence = top score</text>
+<rect x="686" y="18" width="172" height="62" rx="8" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<rect x="836" y="25" width="13" height="12" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="27" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="32" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/>
+<text x="772" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">LLM-as-judge</text>
+<text x="772" y="60" font-size="10" text-anchor="middle" fill="#5b6788">supported by source?</text>
+<text x="772" y="72" font-size="10" text-anchor="middle" fill="#5b6788">calibrate</text>
+<rect x="686" y="110" width="172" height="62" rx="8" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<rect x="836" y="117" width="13" height="12" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="119" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="124" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/>
+<text x="772" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+<text x="772" y="152" font-size="10" text-anchor="middle" fill="#5b6788">grounded: cite or abstain</text>
+<rect x="462" y="202" width="172" height="62" rx="8" fill="#ffeef0" stroke="#e03131" stroke-width="1.6"/>
+<rect x="612" y="209" width="13" height="12" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="608" y="211" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="608" y="216" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/>
+<text x="548" y="227" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Go / no-go</text>
+<text x="548" y="244" font-size="10" text-anchor="middle" fill="#5b6788">weigh failures by impact</text>
+<rect x="169" y="134" width="86" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="212" y="144" font-size="11" text-anchor="middle" fill="#5b6788">chunk + embed</text>
+<rect x="281" y="88" width="86" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="324" y="98" font-size="11" text-anchor="middle" fill="#5b6788">each question</text>
+<rect x="614" y="134" width="92" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="144" font-size="11" text-anchor="middle" fill="#5b6788">top-k + scores</text>
+<rect x="639" y="88" width="43" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="98" font-size="11" text-anchor="middle" fill="#5b6788">answer</text>
+<rect x="723" y="88" width="98" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="772" y="98" font-size="11" text-anchor="middle" fill="#5b6788">answer + source</text>
+<rect x="490" y="134" width="117" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="548" y="144" font-size="11" text-anchor="middle" fill="#5b6788">pass/fail × impact</text>
+</svg>`;
+const diagramCard = {background:'#f7f9fe',border:'1px solid rgba(11,16,32,.10)',borderRadius:'12px',padding:'12px 14px',overflowX:'auto'};
+function SeqDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: SEQ_SVG_VALIDATE}}/>`; }
+function CompDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: COMP_SVG_VALIDATE}}/>`; }
+
 const TOPIC = {
   kicker: "Evaluate & validate · take-home lab",
   slides: [
@@ -469,15 +575,20 @@ const TOPIC = {
       ],
       note: "You don't <i>prove</i> it correct; you <i>measure</i> it's good enough and safe enough, against a bar set in advance." },
 
-    { h: "Architecture", tag: "the assurance loop", comp: Arch },
+    { h: "How one eval run flows", tag: "UML · sequence", comp: SeqDiagram,
+      note: "Read top-to-bottom as time: for each golden question the app retrieves, prompts the LLM, grades the answer — then an LLM-judge and a go/no-go roll-up." },
 
-    { h: "The eval harness — and a baseline to beat", tag: "measure it",
+    { h: "How it's wired", tag: "UML · components", comp: CompDiagram,
+      note: "The golden set + policy corpus feed retrieval and the LLM; a rule grader scores each answer, an LLM-as-judge second-checks it, and impact-weighted results roll up to go/no-go." },
+
+    { h: "The golden set — and the three things it tells you", tag: "measure it",
       bullets: [
-        "A <b>golden set</b>: representative + edge + adversarial + <b>must-refuse</b> cases. Version it.",
-        "Metrics: <b>faithfulness</b>, retrieval recall, abstention, task success.",
-        "Graders: rules → embeddings → <b>LLM-as-judge</b> (calibrate vs humans).",
-        "<b>Beat a baseline</b>, set thresholds first, and gate releases — no green eval, no ship.",
-      ] },
+        "A <b>golden set</b>: a small, fixed, known-answer list — here 4 must-ground facts + 1 <b>must-refuse</b> (the CEO's home address). Version it.",
+        "<b>Result</b> — did it pass? A fact must contain the known value; the refuse case must decline.",
+        "<b>Impact if wrong</b> — Minor / Serious / Critical, <b>set by hand</b> per question; independent of whether the answer was good.",
+        "<b>Evidence</b> — the retrieval cosine, measured each run; a confident answer on <b>weak evidence</b> is what to escalate.",
+      ],
+      note: "You don't <i>prove</i> it correct; you <i>measure</i> it — and the roll-up weighs failures by <b>impact</b>, not by count." },
 
     { h: "What you'll do here", tag: "interactive",
       bullets: [

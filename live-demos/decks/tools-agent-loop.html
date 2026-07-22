@@ -427,52 +427,103 @@ function Deck({ topic: T }) {
 
 /* ====================== CONTENT START (author this region) ====================== */
 /* Tools & the agent loop — the model can now ACT.
-   Arch = the loop: [LLM] → proposes tool call → [approval gate for writes]
-   → [Tool / MCP server] → observed result → back to [LLM] → final answer.
+   SeqDiagram / CompDiagram = the two canonical UML diagrams (sequence +
+   components) from the printed one-pager; they replace the old ad-hoc Arch slide.
    AgentLoop = interactive Plan → Call tool → Observe cycle (with a write that
    pauses at the approval gate), adapted from agent.html's AgentLoop.
    TOPIC = { kicker, slides:[...] }. */
 
-function Arch() {
-  return html`<div class="arch">
-    <svg viewBox="0 0 720 240" role="img">
-      <!-- Goal in -->
-      ${Box({x:8,y:100,w:80,h:40,lines:["Goal"],accent:C.accent})}
-      ${HArrow({x1:88,x2:126,y:120})}
-
-      <!-- LLM -->
-      ${Box({x:126,y:90,w:130,h:62,lines:["LLM","plan + reason"],accent:C.violet,fs:12})}
-      <!-- loop-back arc on the LLM: observe → plan again -->
-      <path d="M 134 90 C 116 50 224 44 250 86" fill="none" stroke=${C.faint} stroke-width="2.2" stroke-dasharray="5 4"/>
-      <polygon points="250,86 238,82 245,73" fill=${C.faint}/>
-      <text x="191" y="40" text-anchor="middle" font-size="10" fill=${C.faint}>loop until done</text>
-
-      <!-- LLM proposes a tool call → approval gate -->
-      ${HArrow({x1:256,x2:332,y:120,color:C.accent,label:"tool call"})}
-
-      <!-- Approval gate (writes only) -->
-      ${Box({x:332,y:90,w:104,h:62,lines:["Approval","gate (writes)"],accent:C.warn,fs:11,color:C.warn})}
-
-      <!-- gate → tool / MCP server -->
-      ${HArrow({x1:436,x2:512,y:120,color:C.accent,label:"if approved"})}
-
-      <!-- Tool / MCP server -->
-      ${Box({x:512,y:78,w:198,h:86,lines:[],fill:"#16223f",stroke:C.line})}
-      <text x="611" y="96" text-anchor="middle" font-size="12" font-weight="700" fill=${C.accent2}>Tool / MCP server</text>
-      ${Box({x:524,y:104,w:174,h:20,lines:["get_order · search_kb · read"],fs:10.5,color:C.muted})}
-      ${Box({x:524,y:130,w:174,h:20,lines:["issue_refund · write"],fs:10.5,color:C.warn})}
-
-      <!-- observed result back to LLM (lower return arrow) -->
-      ${HArrow({x1:512,x2:256,y:188,color:C.accent2})}
-      <text x="384" y="206" text-anchor="middle" font-size="10" fill=${C.accent2}>observed result → back to LLM</text>
-
-      <!-- tool reaches enterprise systems -->
-      ${VArrow({y1:164,x:611,y2:190})}
-      <text x="611" y="210" text-anchor="middle" font-size="10" fill=${C.faint}>Enterprise systems</text>
-    </svg>
-    <div class="archcap">The LLM proposes a tool call; reads run straight through, but a write (issue_refund) routes through a human approval gate first. The tool result is observed and fed back to the LLM, which loops until it can give a final answer.</div>
-  </div>`;
-}
+const SEQ_SVG_TOOLS_AGENT_LOOP = `<svg viewBox="0 0 820 433" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="tools-agent-loop-seq-sf" markerWidth="10" markerHeight="10" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#5b6788"/></marker><marker id="tools-agent-loop-seq-so" markerWidth="12" markerHeight="10" refX="8.5" refY="3.2" orient="auto"><path d="M0,0 L8.5,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="90" y1="58" x2="90" y2="431" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="250" y1="58" x2="250" y2="431" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="410" y1="58" x2="410" y2="431" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="570" y1="58" x2="570" y2="431" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="730" y1="58" x2="730" y2="431" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<rect x="182" y="109" width="456" height="168" rx="5" fill="none" stroke="#9aa7c4" stroke-width="1.1"/>
+<path d="M182,109 h52 v13 l-8,7 h-44 z" fill="#eef1f8" stroke="#9aa7c4" stroke-width="1.1"/>
+<text x="189" y="123" font-size="10.5" font-weight="800" fill="#39435f">loop</text>
+<text x="240" y="123" font-size="10.5" fill="#5b6788">[until done / max steps]</text>
+<line x1="90" y1="80" x2="250" y2="80" stroke="#5b6788" stroke-width="1.6" marker-end="url(#tools-agent-loop-seq-sf)"/>
+<line x1="250" y1="143" x2="410" y2="143" stroke="#5b6788" stroke-width="1.6" marker-end="url(#tools-agent-loop-seq-sf)"/>
+<line x1="410" y1="176" x2="250" y2="176" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-seq-so)"/>
+<line x1="250" y1="209" x2="570" y2="209" stroke="#5b6788" stroke-width="1.6" marker-end="url(#tools-agent-loop-seq-sf)"/>
+<line x1="570" y1="242" x2="250" y2="242" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-seq-so)"/>
+<line x1="250" y1="287" x2="730" y2="287" stroke="#5b6788" stroke-width="1.6" marker-end="url(#tools-agent-loop-seq-sf)"/>
+<line x1="730" y1="320" x2="250" y2="320" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-seq-so)"/>
+<line x1="250" y1="353" x2="90" y2="353" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-seq-so)"/>
+<path d="M584,374 h124 v34 h-124 z" fill="#fffbe8" stroke="#e6c96b" stroke-width="1"/>
+<text x="592" y="388" font-size="10.5" fill="#7a6a2e">search_kb → OpenAI</text>
+<text x="592" y="401" font-size="10.5" fill="#7a6a2e">embeddings</text>
+<rect x="155" y="64" width="31" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="170" y="74" font-size="11" text-anchor="middle" fill="#5b6788">goal</text>
+<rect x="284" y="127" width="92" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="137" font-size="11" text-anchor="middle" fill="#5b6788">plan (context)</text>
+<rect x="299" y="160" width="61" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="170" font-size="11" text-anchor="middle" fill="#5b6788">tool call</text>
+<rect x="330" y="193" width="160" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="203" font-size="11" text-anchor="middle" fill="#5b6788">invoke (read / search_kb)</text>
+<rect x="358" y="226" width="104" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="236" font-size="11" text-anchor="middle" fill="#5b6788">result (observe)</text>
+<rect x="422" y="271" width="135" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="490" y="281" font-size="11" text-anchor="middle" fill="#5b6788">issue_refund? (write)</text>
+<rect x="444" y="304" width="92" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="490" y="314" font-size="11" text-anchor="middle" fill="#5b6788">approve / deny</text>
+<rect x="130" y="337" width="80" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="170" y="347" font-size="11" text-anchor="middle" fill="#5b6788">final answer</text>
+<rect x="21" y="6" width="138" height="52" rx="9" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<text x="90" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">You</text>
+<rect x="181" y="6" width="138" height="52" rx="9" fill="#e9fbf6" stroke="#12b886" stroke-width="1.6"/>
+<text x="250" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Agent loop</text>
+<rect x="341" y="6" width="138" height="52" rx="9" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<text x="410" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+<rect x="501" y="6" width="138" height="52" rx="9" fill="#eef1f6" stroke="#5b6788" stroke-width="1.6"/>
+<text x="570" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Tool server</text>
+<rect x="661" y="6" width="138" height="52" rx="9" fill="#ffeef0" stroke="#e03131" stroke-width="1.6"/>
+<text x="730" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Human</text>
+</svg>`;
+const COMP_SVG_TOOLS_AGENT_LOOP = `<svg viewBox="0 0 872 372" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="tools-agent-loop-comp-dep" markerWidth="12" markerHeight="10" refX="9" refY="3.2" orient="auto"><path d="M0,0 L9,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="186" y1="141" x2="238" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="410" y1="141" x2="462" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="634" y1="141" x2="686" y2="49" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="634" y1="141" x2="686" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="634" y1="141" x2="686" y2="233" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="686" y1="49" x2="410" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="686" y1="233" x2="410" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<line x1="324" y1="172" x2="324" y2="294" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#tools-agent-loop-comp-dep)"/>
+<rect x="14" y="110" width="172" height="62" rx="8" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<rect x="164" y="117" width="13" height="12" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="160" y="119" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="160" y="124" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/>
+<text x="100" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Goal</text>
+<text x="100" y="152" font-size="10" text-anchor="middle" fill="#5b6788">what you want done</text>
+<rect x="238" y="110" width="172" height="62" rx="8" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<rect x="388" y="117" width="13" height="12" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="384" y="119" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="384" y="124" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/>
+<text x="324" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+<text x="324" y="152" font-size="10" text-anchor="middle" fill="#5b6788">OpenAI or Claude — swappable</text>
+<rect x="462" y="110" width="172" height="62" rx="8" fill="#eef1f6" stroke="#5b6788" stroke-width="1.6"/>
+<rect x="612" y="117" width="13" height="12" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="119" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="124" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/>
+<text x="548" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Tool server</text>
+<text x="548" y="152" font-size="10" text-anchor="middle" fill="#5b6788">MCP-style catalog</text>
+<rect x="686" y="18" width="172" height="62" rx="8" fill="#eef1f6" stroke="#5b6788" stroke-width="1.6"/>
+<rect x="836" y="25" width="13" height="12" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="832" y="27" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="832" y="32" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/>
+<text x="772" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Read tools</text>
+<text x="772" y="60" font-size="10" text-anchor="middle" fill="#5b6788">get_order · calculator</text>
+<rect x="686" y="110" width="172" height="62" rx="8" fill="#fff5e0" stroke="#f08c00" stroke-width="1.6"/>
+<rect x="836" y="117" width="13" height="12" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/><rect x="832" y="119" width="7" height="3.4" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/><rect x="832" y="124" width="7" height="3.4" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/>
+<text x="772" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Embeddings</text>
+<text x="772" y="152" font-size="10" text-anchor="middle" fill="#5b6788">OpenAI, always</text>
+<rect x="686" y="202" width="172" height="62" rx="8" fill="#ffeef0" stroke="#e03131" stroke-width="1.6"/>
+<rect x="836" y="209" width="13" height="12" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="832" y="211" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="832" y="216" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/>
+<text x="772" y="227" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Approval gate</text>
+<text x="772" y="244" font-size="10" text-anchor="middle" fill="#5b6788">issue_refund · toggle</text>
+<rect x="238" y="294" width="172" height="62" rx="8" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<rect x="388" y="301" width="13" height="12" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="384" y="303" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="384" y="308" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/>
+<text x="324" y="319" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Final answer</text>
+<text x="324" y="336" font-size="10" text-anchor="middle" fill="#5b6788">or max-step cap</text>
+<rect x="197" y="134" width="31" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="212" y="144" font-size="11" text-anchor="middle" fill="#5b6788">goal</text>
+<rect x="405" y="134" width="61" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="436" y="144" font-size="11" text-anchor="middle" fill="#5b6788">call tool</text>
+<rect x="645" y="88" width="31" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="98" font-size="11" text-anchor="middle" fill="#5b6788">read</text>
+<rect x="629" y="134" width="61" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="144" font-size="11" text-anchor="middle" fill="#5b6788">search_kb</text>
+<rect x="639" y="180" width="43" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="190" font-size="11" text-anchor="middle" fill="#5b6788">write?</text>
+<rect x="523" y="88" width="49" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="548" y="98" font-size="11" text-anchor="middle" fill="#5b6788">observe</text>
+<rect x="511" y="180" width="74" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="548" y="190" font-size="11" text-anchor="middle" fill="#5b6788">approve→run</text>
+<rect x="290" y="226" width="68" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="324" y="236" font-size="11" text-anchor="middle" fill="#5b6788">done / cap</text>
+</svg>`;
+const diagramCard = {background:'#f7f9fe',border:'1px solid rgba(11,16,32,.10)',borderRadius:'12px',padding:'12px 14px',overflowX:'auto'};
+function SeqDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: SEQ_SVG_TOOLS_AGENT_LOOP}}/>`; }
+function CompDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: COMP_SVG_TOOLS_AGENT_LOOP}}/>`; }
 
 function AgentLoop() {
   const steps = [
@@ -520,11 +571,15 @@ const TOPIC = {
 
     { h: "Tools are just typed functions", tag: "the contract", bullets: [
       "A tool is declared with a <b>name</b>, a <b>description</b>, and a <b>JSON schema</b> for its inputs.",
-      "<code>get_order</code> &amp; <code>search_kb</code> are <b>reads</b>; <code>issue_refund</code> is a <b>write</b>.",
+      "<code>get_order</code>, <code>search_kb</code> &amp; <code>calculator</code> are <b>reads</b>; <code>issue_refund</code> is a <b>write</b>.",
       "The model emits a structured <b>tool call</b>; your runtime executes it and returns a result message.",
       "Same contract whether the tool runs in-process or behind an <b>MCP server</b>." ] },
 
-    { h: "Architecture", tag: "the loop, end to end", comp: Arch },
+    { h: "How one request flows", tag: "UML · sequence", comp: SeqDiagram,
+      note: "Read top to bottom as time — each arrow is one call: you hand the agent a <b>goal</b>, it loops <b>plan → call → observe</b>, and a write (<code>issue_refund</code>) pauses for a human <b>approve / deny</b> before the tool server runs it." },
+
+    { h: "How it's wired", tag: "UML · components", comp: CompDiagram,
+      note: "The <b>goal</b> drives the <b>LLM</b>, which calls the <b>tool server</b>: reads (<code>get_order</code>, <code>calculator</code>, <code>search_kb</code>→OpenAI embeddings) run free, but the write (<code>issue_refund</code>) routes through the <b>approval gate</b> before the final answer." },
 
     { h: "The approval gate", tag: "humans on writes", bullets: [
       "<b>Reads run free</b>; <b>writes &amp; irreversible actions</b> pause for a human.",
@@ -536,10 +591,10 @@ const TOPIC = {
       note: "Plan → <b>Call tool</b> → Observe is the whole engine. A <b>read</b> flows straight through; a <b>write</b> stops at the <b>approval gate</b> until a human says yes. Hit <b>Step</b> to advance one beat, or let it <b>Auto</b>-cycle." },
 
     { h: "Try it in the demo", tag: "hands-on", bullets: [
-      "Goal: <b>\"Is order 4471 within the refund window — and refund it if so?\"</b>",
-      "Watch each <b>plan → tool → observe</b> beat appear, step by step.",
-      "Toggle the <b>human approval gate</b> on the write and see the loop pause.",
-      "Adjust <b>Max agent steps</b> and re-run to see the cap change the loop." ] },
+      "Default goal: <b>refund order 4471 if it's within the window</b> — read the loop top to bottom.",
+      "It pauses at the <b>approval gate</b> before <code>issue_refund</code>: <b>Deny</b> and the write never happens.",
+      "<b>Approve</b> and a real refund row appears in <b>Refunds written</b> — a live Neon Postgres write.",
+      "Toggle the gate <b>off</b> to watch it act autonomously, or give it a goal with <b>no matching tool</b>." ] },
 
     { h: "Shortcoming", tag: "what's still missing",
       warn: "It's still a <b>single agent</b> with <b>no governance</b> — no separation of duties, no policy on which tools it may touch, and the approval gate is the <b>only</b> guardrail. Prompt injection &amp; excessive agency stay wide open.",

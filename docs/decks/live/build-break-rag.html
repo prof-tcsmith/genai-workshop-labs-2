@@ -456,6 +456,98 @@ function Arch() {
   </div>`;
 }
 
+// Canonical UML diagrams (same two on the printed one-pager) — replace the old Arch slide.
+const SEQ_SVG_BUILD_BREAK_RAG = `<svg viewBox="0 0 660 552" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="build-break-rag-seq-sf" markerWidth="10" markerHeight="10" refX="8" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#5b6788"/></marker><marker id="build-break-rag-seq-so" markerWidth="12" markerHeight="10" refX="8.5" refY="3.2" orient="auto"><path d="M0,0 L8.5,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="90" y1="58" x2="90" y2="550" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="250" y1="58" x2="250" y2="550" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="410" y1="58" x2="410" y2="550" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<line x1="570" y1="58" x2="570" y2="550" stroke="#c9d2e6" stroke-width="1.3" stroke-dasharray="3 4"/>
+<rect x="182" y="284" width="456" height="211" rx="5" fill="none" stroke="#9aa7c4" stroke-width="1.1"/>
+<path d="M182,284 h43 v13 l-8,7 h-35 z" fill="#eef1f8" stroke="#9aa7c4" stroke-width="1.1"/>
+<text x="189" y="298" font-size="10.5" font-weight="800" fill="#39435f">opt</text>
+<text x="231" y="298" font-size="10.5" fill="#5b6788">[flip a sabotage switch → rebuild]</text>
+<line x1="90" y1="80" x2="250" y2="80" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<path d="M250,113 h26 v16 h-26" fill="none" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="250" y1="156" x2="410" y2="156" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="410" y1="189" x2="250" y2="189" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#build-break-rag-seq-so)"/>
+<line x1="250" y1="222" x2="570" y2="222" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="570" y1="255" x2="250" y2="255" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#build-break-rag-seq-so)"/>
+<path d="M250,318 h26 v16 h-26" fill="none" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="250" y1="361" x2="410" y2="361" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="410" y1="394" x2="250" y2="394" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#build-break-rag-seq-so)"/>
+<line x1="250" y1="427" x2="570" y2="427" stroke="#5b6788" stroke-width="1.6" marker-end="url(#build-break-rag-seq-sf)"/>
+<line x1="570" y1="460" x2="250" y2="460" stroke="#5b6788" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#build-break-rag-seq-so)"/>
+<path d="M264,493 h166 v34 h-166 z" fill="#fffbe8" stroke="#e6c96b" stroke-width="1"/>
+<text x="272" y="507" font-size="10.5" fill="#7a6a2e">the model never changed —</text>
+<text x="272" y="520" font-size="10.5" fill="#7a6a2e">the data did</text>
+<rect x="66" y="64" width="209" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="170" y="74" font-size="11" text-anchor="middle" fill="#5b6788">question — baseline, switches off</text>
+<rect x="284" y="112" width="184" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/>
+<text x="376" y="122" font-size="11" text-anchor="middle" fill="#5b6788">chunk + embed → healthy index</text>
+<rect x="290" y="140" width="80" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="150" font-size="11" text-anchor="middle" fill="#5b6788">search top-k</text>
+<rect x="284" y="173" width="92" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="183" font-size="11" text-anchor="middle" fill="#5b6788">healthy chunks</text>
+<rect x="361" y="206" width="98" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="216" font-size="11" text-anchor="middle" fill="#5b6788">grounded prompt</text>
+<rect x="342" y="239" width="135" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="249" font-size="11" text-anchor="middle" fill="#5b6788">correct, cited answer</text>
+<rect x="284" y="317" width="277" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/>
+<text x="422" y="327" font-size="11" text-anchor="middle" fill="#5b6788">tiny chunks · stale policy · RESTRICTED leak</text>
+<rect x="290" y="345" width="80" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="355" font-size="11" text-anchor="middle" fill="#5b6788">search again</text>
+<rect x="281" y="378" width="98" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="330" y="388" font-size="11" text-anchor="middle" fill="#5b6788">degraded chunks</text>
+<rect x="312" y="411" width="197" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="421" font-size="11" text-anchor="middle" fill="#5b6788">same question, degraded context</text>
+<rect x="309" y="444" width="203" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="410" y="454" font-size="11" text-anchor="middle" fill="#5b6788">wrong / hedging / leaking answer</text>
+<rect x="21" y="6" width="138" height="52" rx="9" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<text x="90" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">You</text>
+<rect x="181" y="6" width="138" height="52" rx="9" fill="#e9fbf6" stroke="#12b886" stroke-width="1.6"/>
+<text x="250" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">App</text>
+<rect x="341" y="6" width="138" height="52" rx="9" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<text x="410" y="27" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">Vector store</text>
+<text x="410" y="43" font-size="9.5" text-anchor="middle" fill="#5b6788">Pinecone/RAM · per session</text>
+<rect x="501" y="6" width="138" height="52" rx="9" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<text x="570" y="37" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+</svg>`;
+const COMP_SVG_BUILD_BREAK_RAG = `<svg viewBox="0 0 872 188" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img">
+<defs><marker id="build-break-rag-comp-dep" markerWidth="12" markerHeight="10" refX="9" refY="3.2" orient="auto"><path d="M0,0 L9,3.2 L0,6.4" fill="none" stroke="#5b6788" stroke-width="1.2"/></marker></defs>
+<line x1="186" y1="49" x2="238" y2="49" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<line x1="186" y1="141" x2="238" y2="49" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<line x1="324" y1="80" x2="324" y2="110" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<line x1="548" y1="64" x2="548" y2="110" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<line x1="410" y1="141" x2="462" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<line x1="634" y1="141" x2="686" y2="141" stroke="#5b6788" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#build-break-rag-comp-dep)"/>
+<rect x="14" y="18" width="172" height="62" rx="8" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<rect x="164" y="25" width="13" height="12" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="27" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="160" y="32" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/>
+<text x="100" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Your documents</text>
+<text x="100" y="60" font-size="10" text-anchor="middle" fill="#5b6788">corpus</text>
+<rect x="14" y="110" width="172" height="62" rx="8" fill="#ffeef0" stroke="#e03131" stroke-width="1.6"/>
+<rect x="164" y="117" width="13" height="12" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="160" y="119" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/><rect x="160" y="124" width="7" height="3.4" fill="#ffeef0" stroke="#e03131" stroke-width="1.2"/>
+<text x="100" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Sabotage switches</text>
+<text x="100" y="152" font-size="10" text-anchor="middle" fill="#5b6788">chunk size · stale · leak</text>
+<rect x="238" y="18" width="172" height="62" rx="8" fill="#fff5e0" stroke="#f08c00" stroke-width="1.6"/>
+<rect x="388" y="25" width="13" height="12" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/><rect x="384" y="27" width="7" height="3.4" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/><rect x="384" y="32" width="7" height="3.4" fill="#fff5e0" stroke="#f08c00" stroke-width="1.2"/>
+<text x="324" y="43" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Chunk + embed</text>
+<text x="324" y="60" font-size="10" text-anchor="middle" fill="#5b6788">embeddings: OpenAI, always</text>
+<rect x="238" y="110" width="172" height="62" rx="8" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.6"/>
+<rect x="388" y="117" width="13" height="12" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="384" y="119" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/><rect x="384" y="124" width="7" height="3.4" fill="#e9f9ee" stroke="#2f9e44" stroke-width="1.2"/>
+<text x="324" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Vector index</text>
+<text x="324" y="152" font-size="10" text-anchor="middle" fill="#5b6788">Pinecone or in-RAM · rebuilt</text>
+<text x="324" y="164" font-size="10" text-anchor="middle" fill="#5b6788">per run</text>
+<rect x="462" y="18" width="172" height="46" rx="8" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.6"/>
+<rect x="612" y="25" width="13" height="12" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="608" y="27" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/><rect x="608" y="32" width="7" height="3.4" fill="#eef4ff" stroke="#6ea8fe" stroke-width="1.2"/>
+<text x="548" y="46" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Question</text>
+<rect x="462" y="110" width="172" height="62" rx="8" fill="#eef1f6" stroke="#5b6788" stroke-width="1.6"/>
+<rect x="612" y="117" width="13" height="12" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="119" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/><rect x="608" y="124" width="7" height="3.4" fill="#eef1f6" stroke="#5b6788" stroke-width="1.2"/>
+<text x="548" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">Retrieve top-k</text>
+<text x="548" y="152" font-size="10" text-anchor="middle" fill="#5b6788">cosine similarity</text>
+<rect x="686" y="110" width="172" height="62" rx="8" fill="#f3edff" stroke="#7c5cff" stroke-width="1.6"/>
+<rect x="836" y="117" width="13" height="12" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="119" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/><rect x="832" y="124" width="7" height="3.4" fill="#f3edff" stroke="#7c5cff" stroke-width="1.2"/>
+<text x="772" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#0b1020">LLM</text>
+<text x="772" y="152" font-size="10" text-anchor="middle" fill="#5b6788">grounded: cite or abstain</text>
+<rect x="187" y="88" width="49" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="212" y="98" font-size="11" text-anchor="middle" fill="#5b6788">degrade</text>
+<rect x="306" y="88" width="37" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="324" y="98" font-size="11" text-anchor="middle" fill="#5b6788">index</text>
+<rect x="620" y="134" width="80" height="14" rx="3.5" fill="#ffffff" stroke="#c9d2e6" stroke-width=".8"/><text x="660" y="144" font-size="11" text-anchor="middle" fill="#5b6788">top-k chunks</text>
+</svg>`;
+const diagramCard = {background:'#f7f9fe',border:'1px solid rgba(11,16,32,.10)',borderRadius:'12px',padding:'12px 14px',overflowX:'auto'};
+function SeqDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: SEQ_SVG_BUILD_BREAK_RAG}}/>`; }
+function CompDiagram(){ return html`<div style=${diagramCard} dangerouslySetInnerHTML=${{__html: COMP_SVG_BUILD_BREAK_RAG}}/>`; }
+
 // Interactive: chunk-size slider with a retrieval-quality bar that peaks at a balanced size.
 // Adapted from slides.html ChunkSlider — quality peaks near ~600 chars and falls off both ways.
 function ChunkSlider() {
@@ -489,25 +581,29 @@ const TOPIC = {
         "Feed them to the model → <b>grounded, cited answers you built yourself.</b>",
       ] },
 
-    { h: "Architecture", tag: "how it fits together", comp: Arch },
+    { h: "How one request flows", tag: "UML · sequence", comp: SeqDiagram,
+      note: "Read top-to-bottom as time: baseline builds a healthy index and gives a cited answer; flip a sabotage switch, rebuild, and the same question comes back wrong — the model never changed, the data did." },
+
+    { h: "How it's wired", tag: "UML · components", comp: CompDiagram,
+      note: "Your documents (plus the sabotage switches) feed Chunk + embed → a rebuilt Vector index; a Question retrieves the top-k chunks, which the grounded LLM turns into a cited answer." },
 
     { h: "How it works", tag: "the mechanics",
       bullets: [
-        "<b>Embeddings</b> turn text into vectors; <b>cosine similarity</b> finds the relevant chunks.",
-        "<b>Chunk size & overlap</b> are design choices — not defaults.",
-        "<b>Context assembly</b> (\"context engineering\") frames the snippets for the model.",
-        "~80% of enterprise AI failures are <b>data-engineering</b> failures the pipeline exposes <small class=\"muted\">(RAND, 2024)</small>.",
+        "<b>Embeddings</b> turn text into vectors; <b>cosine similarity</b> retrieves the top-k closest chunks.",
+        "<b>Chunk size, overlap & top-k</b> are design choices you set with sliders — not defaults.",
+        "Retrieved chunks are <b>assembled into context</b>, each tagged by source so the answer can cite it.",
+        "The <b>system prompt</b> pins the model to that context — and forces it to report <b>both</b> values when two sources conflict.",
       ] },
 
     { h: "Tune the chunking", tag: "interactive", comp: ChunkSlider,
       note: "Drag the slider: retrieval quality peaks at a balanced chunk size and collapses for tiny or huge chunks." },
 
-    { h: "Break it / try it", tag: "where it fails",
+    { h: "Break it — three switches", tag: "where it fails",
       bullets: [
-        "<b>Tiny chunks</b> fragment the rule — the model never sees the whole policy.",
-        "A <b>stale, conflicting doc</b> in the corpus flips the answer.",
-        "A retrieved <b>restricted doc</b> is a real permission leak — not hypothetical.",
-        "<b>Freshness & permissions</b> must reach retrieval, or they don't exist.",
+        "<b>Tiny chunks (size 80)</b> fragment the rule — no single chunk holds the whole policy.",
+        "A <b>conflicting 'stale' policy</b> makes the answer hedge and name both windows (45 vs 14 days).",
+        "Including the <b>RESTRICTED doc</b> is a real permission leak — content the user should never see reaches the answer.",
+        "Each is a <b>data</b> failure, not a model failure — yet the answer still reads perfectly fluent.",
       ] },
 
     { h: "What a RAG still can't do", tag: "the limit",
